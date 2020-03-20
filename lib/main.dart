@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moneymanager/views/category_list.dart';
 import 'package:moneymanager/views/settings.dart';
-import 'package:moneymanager/views/trans.dart';
+import 'package:moneymanager/views/transaction_history.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,38 +26,40 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int selectedIndex = 0;
+  int _selectedIndex = 0;
 
-  void updateIndex(index) {
+  void _onItemTapped(index) {
     setState(() {
-      selectedIndex = index;
+      _selectedIndex = index;
+    
     });
   }
 
-  List<Widget> tabsViews = [TransactionPage(), CategoryListPage(), SettingPage()];
+  List<Widget> tabsViews = [TransactionHistory(), CategoryListPage(), SettingPage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         top: false,
         child: IndexedStack(
-          index: selectedIndex,
+          index: _selectedIndex,
           children: tabsViews,
         ),
       ),
+  
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        onTap: updateIndex,
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            title: Text('Home'),
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
+         
           BottomNavigationBarItem(
               icon: Icon(Icons.add_circle_outline), title: Text('Stats')),
           BottomNavigationBarItem(
               icon: Icon(Icons.pie_chart), title: Text('Overview')),
         ],
+        currentIndex: _selectedIndex,
+        // unselectedItemColor: Colors.black,
+        selectedItemColor: Colors.amber[800],
+        onTap: _onItemTapped,
       ),
     );
   }
