@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moneymanager/views/category_list.dart';
+import 'package:moneymanager/views/settings.dart';
+import 'package:moneymanager/views/trans.dart';
 
 void main() => runApp(MyApp());
 
@@ -7,74 +10,55 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-  final String title;
+  MyHomePage({Key key,}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int selectedIndex = 0;
 
-  void _incrementCounter() {
+  void updateIndex(index) {
     setState(() {
-      _counter++;
+      selectedIndex = index;
     });
   }
 
+  List<Widget> tabsViews = [TransactionPage(), CategoryListPage(), SettingPage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
+      body: SafeArea(
+        top: false,
+        child: IndexedStack(
+          index: selectedIndex,
+          children: tabsViews,
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: selectedIndex,
+        onTap: updateIndex,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('Home')
+            title: Text('Home'),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline),
-          ),
+              icon: Icon(Icons.add_circle_outline), title: Text('Stats')),
           BottomNavigationBarItem(
-              icon: Icon(Icons.pie_chart),
-              title: Text('Overview')
-          ),
+              icon: Icon(Icons.pie_chart), title: Text('Overview')),
         ],
       ),
     );
   }
 }
-
-//this is for testing commit by parimal
