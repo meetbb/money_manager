@@ -58,6 +58,21 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            title: Text('Home')
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle_outline),
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.pie_chart),
+              title: Text('Overview')
+          ),
+        ],
+      ),
     );
   }
 }
