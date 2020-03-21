@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:moneymanager/views/category_list.dart';
 import 'package:moneymanager/views/settings.dart';
 import 'package:moneymanager/views/transaction_history.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() => runApp(MyApp());
+void main() {
+    initializeDateFormatting().then((_) => runApp(MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -19,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key,}) : super(key: key);
+  MyHomePage({Key key}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -36,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<Widget> tabsViews = [TransactionHistory(), CategoryListPage(), SettingPage()];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,10 +53,10 @@ class _MyHomePageState extends State<MyHomePage> {
   
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('Home')),
+          BottomNavigationBarItem(icon: Icon(Icons.table_chart), title: Text('Stats')),
          
           BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline), title: Text('Stats')),
+              icon: Icon(Icons.add_circle_outline), title: Text('Add')),
           BottomNavigationBarItem(
               icon: Icon(Icons.pie_chart), title: Text('Overview')),
         ],
