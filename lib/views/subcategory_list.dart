@@ -3,25 +3,37 @@ import 'package:flutter/material.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/utilities/utils.dart';
 import 'package:moneymanager/views/add_edit_category.dart';
-import 'package:moneymanager/views/subcategory_list.dart';
 
-class CategoryListPage extends StatefulWidget {
+class SubCategoryListPage extends StatefulWidget {
+  final int categoryIndex;
+  SubCategoryListPage({
+    Key key,
+    this.categoryIndex,
+  });
   @override
-  _CategoryListPageState createState() => _CategoryListPageState();
+  _SubCategoryListPageState createState() => _SubCategoryListPageState();
 }
 
-class _CategoryListPageState extends State<CategoryListPage> {
+class _SubCategoryListPageState extends State<SubCategoryListPage> {
+  List<dynamic> subCategoryList = List();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    subCategoryList =
+        categorySubcategoryList[widget.categoryIndex]['subCategory'];
+  }
+
   void _onReorder(int oldIndex, int newIndex) {
     setState(
       () {
-        // if (newIndex > oldIndex) {
-        //   newIndex -= 1;
-        // }
-        if (newIndex > categorySubcategoryList.length)
-          newIndex = categorySubcategoryList.length;
+        if (newIndex > subCategoryList.length)
+          newIndex = subCategoryList.length;
         if (oldIndex < newIndex) newIndex--;
-        final dynamic item = categorySubcategoryList.removeAt(oldIndex);
-        categorySubcategoryList.insert(newIndex, item);
+        final dynamic item = subCategoryList.removeAt(oldIndex);
+        subCategoryList.insert(newIndex, item);
       },
     );
   }
@@ -30,7 +42,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Expenses Category'),
+          title: Text(categorySubcategoryList[widget.categoryIndex]['name']),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -42,9 +54,8 @@ class _CategoryListPageState extends State<CategoryListPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AddEditCategoryPage(
-                              isEdit: false,
-                              isCategory: true,
-                            )),
+                            isEdit: false,
+                            categoryIndex: widget.categoryIndex)),
                   );
                   if (isAddOrEdit != null) {
                     setState(() {});
@@ -57,23 +68,24 @@ class _CategoryListPageState extends State<CategoryListPage> {
             onReorder: _onReorder,
             scrollDirection: Axis.vertical,
             padding: const EdgeInsets.symmetric(vertical: 8.0),
-            children: List.generate(categorySubcategoryList.length, (index) {
-              List<dynamic> subCategories =
-                  categorySubcategoryList[index]['subCategory'];
-
+            children: List.generate(subCategoryList.length, (index) {
               return Container(
                 key: Key('$index'),
                 child: GestureDetector(
                   onTap: () async {
-                    // if (subCategories.length > 0) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SubCategoryListPage(
-                                  categoryIndex: index,
-                                )),
-                      );
-                    // }
+                    var isAddOrEdit = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddEditCategoryPage(
+                                isEdit: true,
+                                editIndex: index,
+                                isCategory: false,
+                                categoryIndex: widget.categoryIndex,
+                              )),
+                    );
+                    if (isAddOrEdit != null) {
+                      setState(() {});
+                    }
                   },
                   child: Column(
                     children: <Widget>[
@@ -83,7 +95,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                             onTap: () {
                               showAlertWithConfirmation(
                                   context, 'Are you sure want to delete ?', () {
-                                categorySubcategoryList.removeAt(index);
+                                subCategoryList.removeAt(index);
                                 setState(() {});
                               });
                             },
@@ -101,10 +113,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                           ),
                           Expanded(
                               child: Text(
-                            categorySubcategoryList[index]['name'] +
-                                ' (' +
-                                subCategories.length.toString() +
-                                ')',
+                            subCategoryList[index]['name'],
                             style: TextStyle(fontSize: 16),
                           )),
                           GestureDetector(
@@ -116,7 +125,8 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                     builder: (context) => AddEditCategoryPage(
                                           isEdit: true,
                                           editIndex: index,
-                                          isCategory: true,
+                                          isCategory: false,
+                                          categoryIndex: widget.categoryIndex,
                                         )),
                               );
                               if (isAddOrEdit != null) {
