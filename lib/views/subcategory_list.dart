@@ -1,29 +1,39 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:moneymanager/database/database.dart';
+import 'package:moneymanager/database/model/category_model.dart';
+import 'package:moneymanager/database/model/subcategory_model.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/utilities/utils.dart';
 import 'package:moneymanager/views/add_edit_category.dart';
 
 class SubCategoryListPage extends StatefulWidget {
-  final int categoryIndex;
+  final CategoryModel category;
+
   SubCategoryListPage({
     Key key,
-    this.categoryIndex,
+    this.category,
   });
   @override
   _SubCategoryListPageState createState() => _SubCategoryListPageState();
 }
 
 class _SubCategoryListPageState extends State<SubCategoryListPage> {
-  List<dynamic> subCategoryList = List();
+  List<SubCategoryModel> subCategoryList = List();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
+    getSubCategories();
+  }
+
+  getSubCategories() async {
     subCategoryList =
-        categorySubcategoryList[widget.categoryIndex]['subCategory'];
+        await DatabaseHelper().getSubCategoryList(widget.category.categoryId);
+
+    setState(() {});
   }
 
   void _onReorder(int oldIndex, int newIndex) {
@@ -42,7 +52,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(categorySubcategoryList[widget.categoryIndex]['name']),
+          title: Text(widget.category.categoryName),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -54,11 +64,12 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AddEditCategoryPage(
-                            isEdit: false,
-                            categoryIndex: widget.categoryIndex)),
+                              isEdit: false,
+                              category: widget.category,
+                            )),
                   );
                   if (isAddOrEdit != null) {
-                    setState(() {});
+                    getSubCategories();
                   }
                 })
           ],
@@ -78,13 +89,15 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                       MaterialPageRoute(
                           builder: (context) => AddEditCategoryPage(
                                 isEdit: true,
-                                editIndex: index,
+                                // editIndex: index,
                                 isCategory: false,
-                                categoryIndex: widget.categoryIndex,
+                                category: widget.category,
+                                subCategory: subCategoryList[index],
+                                // categoryIndex: widget.categoryIndex,
                               )),
                     );
                     if (isAddOrEdit != null) {
-                      setState(() {});
+                      getSubCategories();
                     }
                   },
                   child: Column(
@@ -94,9 +107,11 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                           GestureDetector(
                             onTap: () {
                               showAlertWithConfirmation(
-                                  context, 'Are you sure want to delete ?', () {
-                                subCategoryList.removeAt(index);
-                                setState(() {});
+                                  context, 'Are you sure want to delete ?',
+                                  () async {
+                                await DatabaseHelper()
+                                    .deleteSubCategory(subCategoryList[index]);
+                                getSubCategories();
                               });
                             },
                             child: Container(
@@ -113,7 +128,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                           ),
                           Expanded(
                               child: Text(
-                            subCategoryList[index]['name'],
+                            subCategoryList[index].subCategoryName,
                             style: TextStyle(fontSize: 16),
                           )),
                           GestureDetector(
@@ -124,13 +139,15 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                                 MaterialPageRoute(
                                     builder: (context) => AddEditCategoryPage(
                                           isEdit: true,
-                                          editIndex: index,
+                                          // editIndex: index,
                                           isCategory: false,
-                                          categoryIndex: widget.categoryIndex,
+                                          category: widget.category,
+                                          subCategory: subCategoryList[index],
+                                          // categoryIndex: widget.categoryIndex,
                                         )),
                               );
                               if (isAddOrEdit != null) {
-                                setState(() {});
+                                getSubCategories();
                               }
                             },
                             child: Container(

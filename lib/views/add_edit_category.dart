@@ -1,21 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:moneymanager/utilities/constants.dart';
-import 'package:moneymanager/utilities/utils.dart';
+import 'package:moneymanager/database/database.dart';
+import 'package:moneymanager/database/model/category_model.dart';
+import 'package:moneymanager/database/model/subcategory_model.dart';
 
 class AddEditCategoryPage extends StatefulWidget {
   bool isEdit = false;
-
   bool isCategory = true;
-  int editIndex = 0;
-  int categoryIndex = 0;
+  CategoryModel category;
+  SubCategoryModel subCategory;
+
+  // int editIndex = 0;
+  // int categoryIndex = 0;
 
   AddEditCategoryPage(
       {Key key,
       @required this.isEdit,
-      this.editIndex,
+      // this.editIndex,
       this.isCategory,
-      this.categoryIndex});
+      this.category,
+      this.subCategory});
 
   @override
   _AddEditCategoryPageState createState() => _AddEditCategoryPageState();
@@ -31,12 +35,9 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
     super.initState();
     if (widget.isEdit == true) {
       if (widget.isCategory == true) {
-        categoryNameController.text =
-            categorySubcategoryList[widget.editIndex]['name'];
+        categoryNameController.text = widget.category.categoryName;
       } else {
-        categoryNameController.text =
-            categorySubcategoryList[widget.categoryIndex]['subCategory']
-                [widget.editIndex]['name'];
+        categoryNameController.text = widget.subCategory.subCategoryName;
       }
       saveButtonEnabled = true;
     }
@@ -46,7 +47,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Expenses Category'),
+        title: Text(widget.isCategory == true ? 'Expenses Category' : 'Expenses Sub Category'),
       ),
       body: Container(
         padding: EdgeInsets.only(top: 20, bottom: 20, left: 16, right: 16),
@@ -66,8 +67,8 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
               },
               decoration: InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: 'Enter Category',
-                  hintText: 'Enter Category'),
+                  labelText: 'Enter Sub Category',
+                  hintText: 'Enter Sub Category'),
             ),
             SizedBox(
               height: 20,
@@ -80,62 +81,58 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
               padding: EdgeInsets.all(16.0),
               splashColor: Colors.blueAccent,
               onPressed: saveButtonEnabled == true
-                  ? () {
+                  ? () async {
                       if (widget.isEdit) {
                         if (widget.isCategory == true) {
-                          if (categorySubcategoryList[widget.editIndex]
-                                  ['name'] ==
+                          if (widget.category.categoryName !=
                               categoryNameController.text) {
-                            showAlert(context, 'Don\'t enter same name');
-                            return;
+                            // showAlert(context, 'Don\'t enter same name');
+                            // return;
+                            widget.category.categoryName =
+                                categoryNameController.text;
+
+                            await DatabaseHelper()
+                                .editCategory(widget.category);
                           }
-                          categorySubcategoryList[widget.editIndex]['name'] =
-                              categoryNameController.text;
+
                           Navigator.pop(context, true);
                         } else {
-                          if (categorySubcategoryList[widget.categoryIndex]
-                                  ['subCategory'][widget.editIndex]['name'] ==
+                          if (widget.category.categoryName !=
                               categoryNameController.text) {
-                            showAlert(context, 'Don\'t enter same name');
-                            return;
+                            // showAlert(context, 'Don\'t enter same name');
+                            // return;
+                            widget.subCategory.subCategoryName =
+                                categoryNameController.text;
+
+                            await DatabaseHelper()
+                                .editSubCategory(widget.subCategory);
                           }
-                          categorySubcategoryList[widget.categoryIndex]
-                                  ['subCategory'][widget.editIndex]['name'] =
-                              categoryNameController.text;
                           Navigator.pop(context, true);
                         }
                       } else {
                         if (widget.isCategory == true) {
-                          dynamic lastCategory = categorySubcategoryList.last;
-                          String latestCategoryId =
-                              (int.parse(lastCategory['id']) + 1).toString();
-                          Map<String, dynamic> latestCategory = Map();
-                          latestCategory['id'] = latestCategoryId;
-                          latestCategory['name'] = categoryNameController.text;
-                          latestCategory['subCategory'] = List();
-                          categorySubcategoryList.add(latestCategory);
+                          List<CategoryModel> categoryList =
+                              await DatabaseHelper().getCategoryList();
+
+                          await DatabaseHelper().addCategory(new CategoryModel(
+                              categoryNameController.text,
+                              categoryList.last.position + 1));
+
                           Navigator.pop(context, true);
                         } else {
-                          List<dynamic> subCategoryList =
-                              categorySubcategoryList[widget.categoryIndex]
-                                  ['subCategory'];
-                          String latestSubCategoryId = '';
-                          if (subCategoryList.length > 0) {
-                            dynamic lastSubCategory = subCategoryList.last;
-                            latestSubCategoryId =
-                                (int.parse(lastSubCategory['id']) + 1)
-                                    .toString();
-                          } else {
-                            latestSubCategoryId = '1';
+                          List<SubCategoryModel> subcategoryList =
+                              await DatabaseHelper().getSubCategoryList(
+                                  widget.category.categoryId);
+                          int position = 0;
+                          if (subcategoryList.length > 0) {
+                            position = subcategoryList.last.position;
                           }
+                          await DatabaseHelper().addSubCategory(
+                              new SubCategoryModel(
+                                  categoryNameController.text,
+                                  widget.category.categoryId,
+                                  position + 1));
 
-                          Map<String, String> latestSubCategory = Map();
-                          latestSubCategory['id'] = latestSubCategoryId;
-                          latestSubCategory['name'] =
-                              categoryNameController.text;
-                          categorySubcategoryList[widget.categoryIndex]
-                                  ['subCategory']
-                              .add(latestSubCategory);
                           Navigator.pop(context, true);
                         }
                       }
