@@ -31,7 +31,7 @@ class DatabaseHelper {
   void _onCreate(Database db, int version) async {
     // When creating the db, create the table
     await db.execute(
-        "CREATE TABLE TransactionDetail(id INTEGER PRIMARY KEY, transactionname TEXT, transactionamount TEXT, transactiondate TEXT, transactioncategory TEXT)");
+        "CREATE TABLE TransactionDetail(id INTEGER PRIMARY KEY, transactionname TEXT, transactionamount TEXT, transactiondate TEXT, transactioncategory TEXT, iswithdrawal BOOLEAN)");
   }
 
   Future<int> saveTransaction(TransactionModel trxnModel) async {
@@ -49,7 +49,8 @@ class DatabaseHelper {
           list[i]["transactionname"],
           list[i]["transactionamount"],
           list[i]["transactiondate"],
-          list[i]["transactioncategory"]);
+          list[i]["transactioncategory"],
+          (list[i]["iswithdrawal"] == 1));
       trxnModel.setUserId(list[i]["id"]);
       trxnList.add(trxnModel);
     }
@@ -59,14 +60,17 @@ class DatabaseHelper {
 
   Future<List<TransactionModel>> getTrxnByCategory(String category) async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail');
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT * FROM TransactionDetail WHERE transactioncategory = ?',
+        [category]);
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
           list[i]["transactionname"],
           list[i]["transactionamount"],
           list[i]["transactiondate"],
-          list[i]["transactioncategory"]);
+          list[i]["transactioncategory"],
+          list[i]["iswithdrawal"]);
       trxnModel.setUserId(list[i]["id"]);
       trxnList.add(trxnModel);
     }
@@ -85,7 +89,8 @@ class DatabaseHelper {
           list[i]["transactionname"],
           list[i]["transactionamount"],
           list[i]["transactiondate"],
-          list[i]["transactioncategory"]);
+          list[i]["transactioncategory"],
+          list[i]["iswithdrawal"]);
       trxnModel.setUserId(list[i]["id"]);
       trxnList.add(trxnModel);
     }
@@ -95,14 +100,17 @@ class DatabaseHelper {
 
   Future<List<TransactionModel>> getMonthlyTrxnList() async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail');
+    String sql =
+        'SELECT * FROM TransactionDetail WHERE CAST(transactiondate AS DATE) >= \'10-03-2020\';';
+    List<Map> list = await dbClient.rawQuery(sql);
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
           list[i]["transactionname"],
           list[i]["transactionamount"],
           list[i]["transactiondate"],
-          list[i]["transactioncategory"]);
+          list[i]["transactioncategory"],
+          (list[i]["iswithdrawal"] == 1));
       trxnModel.setUserId(list[i]["id"]);
       trxnList.add(trxnModel);
     }
