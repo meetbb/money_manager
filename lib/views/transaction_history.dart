@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:flutter/material.dart';
@@ -37,20 +38,20 @@ class TransactionHistoryState extends State<TransactionHistory>
       case "Investment":
         imageAsset = 'assets/rent.svg';
         break;
-        case "Food":
+      case "Food":
         imageAsset = 'assets/food.svg';
         break;
-        case "income":
+      case "income":
         imageAsset = 'assets/salary.svg';
         break;
-        case "rent":
+      case "rent":
         imageAsset = 'assets/rent.svg';
         break;
-        case "shopping":
+      case "shopping":
         imageAsset = 'assets/shopping.svg';
         break;
       default:
-      imageAsset = 'assets/home.svg';
+        imageAsset = 'assets/home.svg';
     }
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -72,36 +73,25 @@ class TransactionHistoryState extends State<TransactionHistory>
         model.trxnName,
         style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
       ),
-
-      subtitle: Column(
+      subtitle: Row(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(Icons.linear_scale, color: Colors.orangeAccent),
-              Text(
-                model.trxnAmount,
-                style: TextStyle(
-                    color: Colors.black87, fontStyle: FontStyle.italic),
-              )
-            ],
+          Icon(
+            Icons.date_range,
+            color: Colors.blueAccent,
+            size: 16,
           ),
           SizedBox(
-            height: 4,
+            width: 5,
           ),
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.date_range,
-                color: Colors.orangeAccent,
-                size: 16,
-              ),
-              Text(model.trxnDate, style: TextStyle(color: Colors.black87))
-            ],
-          ),
+          Text(model.trxnDate, style: TextStyle(color: Colors.black87))
         ],
       ),
-      trailing:
-          Icon(Icons.keyboard_arrow_right, color: Colors.black45, size: 30.0),
+      trailing: Text(
+        model.trxnAmount,
+        style: TextStyle(
+            color: model.isWithDrawal ? Colors.redAccent : Colors.greenAccent,
+            fontWeight: FontWeight.w600),
+      ),
     );
   }
 
@@ -263,9 +253,32 @@ class TransactionHistoryState extends State<TransactionHistory>
   }
 
   Future addRecord() async {
+    var categoryList = ['Investment', 'Food', 'income', 'rent', 'shopping'];
+    var amountList = ['₹ 200', '₹ 250', '₹ 2000', '₹ 1000', '₹ 2500'];
+    var titleList = [
+      'New MF Purchase',
+      'Dinner',
+      'Salary',
+      'Home rent',
+      'Clothes Shopping'
+    ];
+    var dateList = [
+      '23-03-2020',
+      '24-03-2020',
+      '21-03-2020',
+      '12-03-2020',
+      '02-03-2020'
+    ];
+    var typeList = [false, true];
     var db = new DatabaseHelper();
+    final _random = new Random();
+    var categoryElement = categoryList[_random.nextInt(categoryList.length)];
+    var amountElement = amountList[_random.nextInt(amountList.length)];
+    var titleElement = titleList[_random.nextInt(titleList.length)];
+    var dateElement = dateList[_random.nextInt(dateList.length)];
+    var typeElement = typeList[_random.nextInt(typeList.length)];
     var transaction = new TransactionModel(
-        "New MF Purchase", "£ 200", "20-03-2020", "Investment");
+        titleElement, amountElement, dateElement, categoryElement, typeElement);
     int insertValue = await db.saveTransaction(transaction);
     if (insertValue > 0) {
       setState(() {

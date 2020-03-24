@@ -28,17 +28,19 @@ class _SettingPageState extends State<SettingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text('Statistics'),
       ),
+      backgroundColor: Colors.grey[100],
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Container(
-              height: 200,
+              padding: EdgeInsets.all(20.0),
+              height: 300,
               child: Center(
-                child: DonutAutoLabelChart.withRandomData(),
+                child: DonutAutoLabelChart.withSampleData(),
               ),
             ),
             SizedBox(
@@ -68,20 +70,20 @@ class _SettingPageState extends State<SettingPage> {
       case "Investment":
         imageAsset = 'assets/rent.svg';
         break;
-        case "Food":
+      case "Food":
         imageAsset = 'assets/food.svg';
         break;
-        case "income":
+      case "income":
         imageAsset = 'assets/salary.svg';
         break;
-        case "rent":
+      case "rent":
         imageAsset = 'assets/rent.svg';
         break;
-        case "shopping":
+      case "shopping":
         imageAsset = 'assets/shopping.svg';
         break;
       default:
-      imageAsset = 'assets/home.svg';
+        imageAsset = 'assets/home.svg';
     }
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
@@ -104,36 +106,25 @@ class _SettingPageState extends State<SettingPage> {
         style: textlib.TextStyle(
             color: Colors.black87, fontWeight: FontWeight.bold),
       ),
-      subtitle: Column(
+      subtitle: Row(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Icon(Icons.linear_scale, color: Colors.orangeAccent),
-              Text(
-                model.trxnAmount,
-                style: textlib.TextStyle(
-                    color: Colors.black87, fontStyle: FontStyle.italic),
-              )
-            ],
+          Icon(
+            Icons.date_range,
+            color: Colors.blueAccent,
+            size: 16,
           ),
           SizedBox(
-            height: 4,
+            width: 5,
           ),
-          Row(
-            children: <Widget>[
-              Icon(
-                Icons.date_range,
-                color: Colors.orangeAccent,
-                size: 16,
-              ),
-              Text(model.trxnDate,
-                  style: textlib.TextStyle(color: Colors.black87))
-            ],
-          ),
+          Text(model.trxnDate, style: textlib.TextStyle(color: Colors.black87))
         ],
       ),
-      trailing:
-          Icon(Icons.keyboard_arrow_right, color: Colors.black45, size: 30.0),
+      trailing: Text(
+        model.trxnAmount,
+        style: textlib.TextStyle(
+            color: model.isWithDrawal ? Colors.redAccent : Colors.greenAccent,
+            fontWeight: FontWeight.w600),
+      ),
     );
   }
 
@@ -141,12 +132,14 @@ class _SettingPageState extends State<SettingPage> {
     return StreamBuilder<List<TransactionModel>>(
         stream: trxnListBloc.trxnModelListStream,
         builder: (context, snapshot) {
-          if (snapshot. hasData) {
+          if (snapshot.hasData) {
             return Container(
+              padding: EdgeInsets.only(bottom: 10.0),
               color: Colors.grey[100],
               child: ListView.builder(
                 scrollDirection: basicdesign.Axis.vertical,
                 shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) {
                   TransactionModel model = snapshot.data[index];
@@ -161,13 +154,55 @@ class _SettingPageState extends State<SettingPage> {
   }
 }
 
+// List<Series> getChartsList(List<TransactionModel> modelList) {
+//     List<Series<TrxnData, int>> seriesList = new List();
+//     List<TrxnData> salesData = new List();
+//     int index = 0;
+//     for (var model in modelList) {
+//       salesData.add(new TrxnData(index, model.trxnAmount));
+//     }
+//     seriesList.add(new Series<TrxnData, int>(
+//         id: 'Transactions',
+//         domainFn: (TrxnData sales, _) => sales.index,
+//         measureFn: (TrxnData sales, _) => sales.trxnAmount,
+//         data: salesData,
+//         labelAccessorFn: (TrxnData row, _) => '${row.}: ${row.sales}',
+//       ));
+//     return seriesList;
+//   }
+
+class TrxnData {
+  final int index;
+  final String trxnAmount;
+
+  TrxnData(this.index, this.trxnAmount);
+}
+
 class TrxnListBloc {
   StreamController<List<TransactionModel>> controller =
       new StreamController.broadcast();
   var db = new DatabaseHelper();
 
   void updateTrxnList() async {
-    List<TransactionModel> trxnList = await db.getTrxnList();
+    // List<TransactionModel> trxnList = await db.getDailyTrxnList("24-03-2020");
+    List<TransactionModel> trxnList = await db.getMonthlyTrxnList();
+    controller.sink.add(trxnList);
+  }
+
+  void dispose() {
+    controller.close();
+  }
+
+  Stream get trxnModelListStream => controller.stream;
+}
+
+class TrxnChartBloc {
+  StreamController<List<TransactionModel>> controller =
+      new StreamController.broadcast();
+  var db = new DatabaseHelper();
+
+  void updateTrxnList() async {
+    List<TransactionModel> trxnList = await db.getDailyTrxnList("24-03-2020");
     controller.sink.add(trxnList);
   }
 
