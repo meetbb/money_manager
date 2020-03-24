@@ -47,7 +47,9 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
   Widget build(context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isCategory == true ? 'Expenses Category' : 'Expenses Sub Category'),
+        title: Text(widget.isCategory == true
+            ? 'Expenses Category'
+            : 'Expenses Sub Category'),
       ),
       body: Container(
         padding: EdgeInsets.only(top: 20, bottom: 20, left: 16, right: 16),
@@ -66,9 +68,12 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                 setState(() {});
               },
               decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter Sub Category',
-                  hintText: 'Enter Sub Category'),
+                border: OutlineInputBorder(),
+                labelText:
+                    widget.isCategory ? 'Enter Category' : 'Enter Sub Category',
+                hintText:
+                    widget.isCategory ? 'Enter Category' : 'Enter Sub Category',
+              ),
             ),
             SizedBox(
               height: 20,
@@ -128,10 +133,8 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                             position = subcategoryList.last.position;
                           }
                           await DatabaseHelper().addSubCategory(
-                              new SubCategoryModel(
-                                  categoryNameController.text,
-                                  widget.category.categoryId,
-                                  position + 1));
+                              new SubCategoryModel(categoryNameController.text,
+                                  widget.category.categoryId, position + 1));
 
                           Navigator.pop(context, true);
                         }

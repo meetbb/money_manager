@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
+import 'package:moneymanager/views/add_expenses.dart';
 import 'package:moneymanager/views/calendar_trxns.dart';
 
 class TransactionHistory extends StatefulWidget {
@@ -259,6 +260,15 @@ class TransactionHistoryState extends State<TransactionHistory>
         controller: _tabController,
         children: getTabViewWidgets(),
       ),
+      floatingActionButton: new FloatingActionButton(
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AddExpensesPage()),
+            );
+          },
+        )
     );
   }
 

@@ -106,6 +106,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                 // }
                               },
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
                                   Row(
                                     children: <Widget>[

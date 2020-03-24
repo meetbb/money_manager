@@ -65,6 +65,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                     MaterialPageRoute(
                         builder: (context) => AddEditCategoryPage(
                               isEdit: false,
+                              isCategory: false,
                               category: widget.category,
                             )),
                   );
@@ -101,6 +102,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                     }
                   },
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Row(
                         children: <Widget>[

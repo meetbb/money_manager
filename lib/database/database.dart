@@ -76,7 +76,9 @@ class DatabaseHelper {
 
   Future<List<TransactionModel>> getDailyTrxnList(String currentdate) async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail WHERE transactiondate = ?', [currentdate]);
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT * FROM TransactionDetail WHERE transactiondate = ?',
+        [currentdate]);
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
@@ -130,11 +132,11 @@ class DatabaseHelper {
     } catch (e) {
       // await db.execute('DROP TABLE IF EXISTS Category;');
       await db.execute(
-          "CREATE TABLE IF NOT EXISTS Category(categoryId INTEGER PRIMARY KEY AUTOINCREMENT, categoryName TEXT, position INTEGER)");
+          "CREATE TABLE IF NOT EXISTS Category(category_Id INTEGER PRIMARY KEY AUTOINCREMENT, category_Name TEXT, category_type TEXT, logo TEXT, position INTEGER)");
       debugPrint('table created');
 
       await db.execute(
-          "CREATE TABLE IF NOT EXISTS SubCategory(subCategoryId INTEGER PRIMARY KEY AUTOINCREMENT, subCategoryName TEXT,categoryId INTEGER, position INTEGER)");
+          "CREATE TABLE IF NOT EXISTS SubCategory(subcategory_id INTEGER PRIMARY KEY AUTOINCREMENT, subcategory_name TEXT,category_id INTEGER,subcategory_type TEXT, logo TEXT, position INTEGER)");
 
       await addCategoriesData();
     }
