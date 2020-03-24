@@ -21,7 +21,7 @@ class _CategorySelectionState extends State<CategorySelection> {
   }
 
   Future<List<CategoryModel>> getCategories() async {
-    List<CategoryModel> categoryList = await DatabaseHelper().getCategoryList();
+    List<CategoryModel> categoryList = await databaseHelper.getCategoryList();
     // setState(() {});
     return categoryList;
   }
@@ -85,7 +85,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   Future<List<SubCategoryModel>> getSubCategories(int catId) async {
     List<SubCategoryModel> subCategoryList =
-        await DatabaseHelper().getSubCategoryList(catId);
+        await databaseHelper.getSubCategoryList(catId);
     return subCategoryList;
   }
 

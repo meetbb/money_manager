@@ -1,41 +1,53 @@
 class TransactionModel {
-  
   int trxnId;
-  String trxnName;
-  String trxnAmount;
+  int trxnAmount;
   String trxnDate;
-  String trxnCategory;
-  bool isWithDrawal;
+  int categoryId;
+  int subCategoryId;
+  String description;
+  String imagePath;
+  String lastModifiedDate;
 
-  TransactionModel(this.trxnName, this.trxnAmount, this.trxnDate, this.trxnCategory, this.isWithDrawal);
+  TransactionModel(
+      this.trxnAmount,
+      this.trxnDate,
+      this.categoryId,
+      this.subCategoryId,
+      this.description,
+      this.imagePath,
+      this.lastModifiedDate);
 
   TransactionModel.map(dynamic obj) {
-    this.trxnName = obj["transactionname"];
-    this.trxnAmount = obj["transactionamount"];
-    this.trxnDate = obj["transactiondate"];
-    this.trxnCategory = obj["transactioncategory"];
-    this.isWithDrawal = obj["iswithdrawal"];
+    this.trxnAmount = obj["trxnAmount"];
+    this.trxnDate = obj["trxnDate"];
+    this.categoryId = obj["categoryId"];
+    this.subCategoryId = obj["subCategoryId"];
+    this.description = obj["description"];
+    this.imagePath = obj["imagePath"];
+    this.lastModifiedDate = obj["lastModifiedDate"];
   }
 
-  String get getTrxnName => trxnName;
-
-  String get getTrxnAmount => trxnAmount;
-
+  int get getTrxnAmount => trxnAmount;
   String get getTrxnDate => trxnDate;
-
-  bool get isWithdrawal => isWithDrawal;
+  int get getCategoryId => categoryId;
+  int get getSubCategoryId => subCategoryId;
+  String get getDescription => description;
+  String get getImagePath => imagePath;
+  String get getLastModifiedDate => lastModifiedDate;
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
-    map["transactionname"] = trxnName;
-    map["transactionamount"] = trxnAmount;
-    map["transactiondate"] = trxnDate;
-    map["transactioncategory"] = trxnCategory;
-    map["iswithdrawal"] = isWithDrawal;
+    map["trxnAmount"] = trxnAmount;
+    map["trxnDate"] = trxnDate;
+    map["categoryId"] = categoryId;
+    map["subCategoryId"] = subCategoryId;
+    map["description"] = description;
+    map["imagePath"] = imagePath;
+    map["lastModifiedDate"] = lastModifiedDate;
     return map;
   }
 
-  void setUserId(int id) {
+  void setTrxnId(int id) {
     this.trxnId = id;
   }
 }

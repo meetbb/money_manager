@@ -29,19 +29,19 @@ class _CategoryListPageState extends State<CategoryListPage> {
   @override
   void initState() {
     super.initState();
-    createCategoryTable();
+    getCategories();
   }
 
-  createCategoryTable() async {
-    await DatabaseHelper().createCategoryTable(await DatabaseHelper().db);
-    categoryList = await DatabaseHelper().getCategoryList();
+  getCategories() async {
+    // await DatabaseHelper().createCategoryTable(await DatabaseHelper().db);
+    categoryList = await databaseHelper.getCategoryList();
 
     setState(() {});
   }
 
   Future<String> getSubCategoryCount(index) async {
-    List<SubCategoryModel> subcategoryList = await DatabaseHelper()
-        .getSubCategoryList(categoryList[index].categoryId);
+    List<SubCategoryModel> subcategoryList =
+        await databaseHelper.getSubCategoryList(categoryList[index].categoryId);
     if (subcategoryList.length > 0) {
       return subcategoryList.length.toString();
     } else {
@@ -70,7 +70,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                             )),
                   );
                   if (isAddOrEdit != null) {
-                    categoryList = await DatabaseHelper().getCategoryList();
+                    categoryList = await databaseHelper.getCategoryList();
 
                     setState(() {});
                   }
@@ -115,11 +115,11 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                           showAlertWithConfirmation(context,
                                               'Are you sure want to delete ?',
                                               () async {
-                                            await DatabaseHelper()
+                                            databaseHelper
                                                 .deleteCategory(
                                                     categoryList[index]);
                                             categoryList =
-                                                await DatabaseHelper()
+                                                await databaseHelper
                                                     .getCategoryList();
                                             // categoryList.removeAt(index);
                                             setState(() {});
@@ -164,7 +164,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                           );
                                           if (isAddOrEdit != null) {
                                             categoryList =
-                                                await DatabaseHelper()
+                                                await databaseHelper
                                                     .getCategoryList();
                                             setState(() {});
                                           }

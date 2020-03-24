@@ -31,7 +31,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
 
   getSubCategories() async {
     subCategoryList =
-        await DatabaseHelper().getSubCategoryList(widget.category.categoryId);
+        await databaseHelper.getSubCategoryList(widget.category.categoryId);
 
     setState(() {});
   }
@@ -111,7 +111,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
                               showAlertWithConfirmation(
                                   context, 'Are you sure want to delete ?',
                                   () async {
-                                await DatabaseHelper()
+                                databaseHelper
                                     .deleteSubCategory(subCategoryList[index]);
                                 getSubCategories();
                               });

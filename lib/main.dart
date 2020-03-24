@@ -39,6 +39,12 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    setDatabase();
+  }
+
+  void setDatabase() async {
+    databaseHelper = new DatabaseHelper();
+    await databaseHelper.createCategoryTable(await databaseHelper.db);
   }
 
   void _onItemTapped(index) {

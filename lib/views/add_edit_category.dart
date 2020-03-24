@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/category_model.dart';
 import 'package:moneymanager/database/model/subcategory_model.dart';
+import 'package:moneymanager/utilities/constants.dart';
 
 class AddEditCategoryPage extends StatefulWidget {
   bool isEdit = false;
@@ -96,8 +97,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                             widget.category.categoryName =
                                 categoryNameController.text;
 
-                            await DatabaseHelper()
-                                .editCategory(widget.category);
+                            databaseHelper.editCategory(widget.category);
                           }
 
                           Navigator.pop(context, true);
@@ -109,32 +109,38 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                             widget.subCategory.subCategoryName =
                                 categoryNameController.text;
 
-                            await DatabaseHelper()
-                                .editSubCategory(widget.subCategory);
+                            databaseHelper.editSubCategory(widget.subCategory);
                           }
                           Navigator.pop(context, true);
                         }
                       } else {
                         if (widget.isCategory == true) {
                           List<CategoryModel> categoryList =
-                              await DatabaseHelper().getCategoryList();
+                              await databaseHelper.getCategoryList();
 
-                          await DatabaseHelper().addCategory(new CategoryModel(
-                              categoryNameController.text,
-                              categoryList.last.position + 1));
+                          databaseHelper.addCategory(new CategoryModel(
+                            categoryNameController.text,
+                            0,
+                            '',
+                            categoryList.last.position + 1,
+                          ));
 
                           Navigator.pop(context, true);
                         } else {
                           List<SubCategoryModel> subcategoryList =
-                              await DatabaseHelper().getSubCategoryList(
+                              await  databaseHelper.getSubCategoryList(
                                   widget.category.categoryId);
                           int position = 0;
                           if (subcategoryList.length > 0) {
                             position = subcategoryList.last.position;
                           }
-                          await DatabaseHelper().addSubCategory(
-                              new SubCategoryModel(categoryNameController.text,
-                                  widget.category.categoryId, position + 1));
+                          await  databaseHelper.addSubCategory(
+                              new SubCategoryModel(
+                                  categoryNameController.text,
+                                  widget.category.categoryId,
+                                  0,
+                                  '',
+                                  position + 1));
 
                           Navigator.pop(context, true);
                         }

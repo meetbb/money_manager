@@ -30,28 +30,46 @@ class DatabaseHelper {
 
   void _onCreate(Database db, int version) async {
     // When creating the db, create the table
+    await db.execute('DROP TABLE IF EXISTS Transactions;');
+    await db.execute('DROP TABLE IF EXISTS Category;');
+    await db.execute('DROP TABLE IF EXISTS SubCategory;');
+
     await db.execute(
-        "CREATE TABLE TransactionDetail(id INTEGER PRIMARY KEY, transactionname TEXT, transactionamount TEXT, transactiondate TEXT, transactioncategory TEXT, iswithdrawal BOOLEAN)");
+        "CREATE TABLE IF NOT EXISTS Transactions(trxnId INTEGER PRIMARY KEY AUTOINCREMENT, trxnAmount INTEGER, trxnDate TEXT, categoryId INTEGER, subCategoryId INTEGER , description TEXT, imagePath TEXT, entryDate TEXT, lastModifiedDate TEXT)");
+
+    debugPrint('Transaction table created');
+    // await db.execute(
+    //     "CREATE TABLE IF NOT EXISTS Category(categoryId INTEGER PRIMARY KEY AUTOINCREMENT, categoryName TEXT, categoryType INTEGER , logo TEXT, position INTEGER)");
+    // debugPrint('table created');
+
+    // await db.execute(
+    //     "CREATE TABLE IF NOT EXISTS SubCategory(subCategoryId INTEGER PRIMARY KEY AUTOINCREMENT, subCategoryName TEXT,categoryId INTEGER, subCategoryType INTEGER , logo TEXT, position INTEGER)");
+    // await addCategoriesData();
+
+    // await createCategoryTable(db);
   }
 
   Future<int> saveTransaction(TransactionModel trxnModel) async {
     var dbClient = await db;
-    int res = await dbClient.insert("TransactionDetail", trxnModel.toMap());
+    int res = await dbClient.insert("Transactions", trxnModel.toMap());
     return res;
   }
 
   Future<List<TransactionModel>> getTrxnList() async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail');
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM Transactions');
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
-          list[i]["transactionname"],
-          list[i]["transactionamount"],
-          list[i]["transactiondate"],
-          list[i]["transactioncategory"],
-          (list[i]["iswithdrawal"] == 1));
-      trxnModel.setUserId(list[i]["id"]);
+        list[i]["trxnAmount"],
+        list[i]["trxnDate"],
+        list[i]["categoryId"],
+        list[i]["subCategoryId"],
+        list[i]["description"],
+        list[i]["imagePath"],
+        list[i]["lastModifiedDate"],
+      );
+      trxnModel.setTrxnId(list[i]["trxnId"]);
       trxnList.add(trxnModel);
     }
     print(trxnList.length);
@@ -60,18 +78,19 @@ class DatabaseHelper {
 
   Future<List<TransactionModel>> getTrxnByCategory(String category) async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM TransactionDetail WHERE transactioncategory = ?',
-        [category]);
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM Transactions');
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
-          list[i]["transactionname"],
-          list[i]["transactionamount"],
-          list[i]["transactiondate"],
-          list[i]["transactioncategory"],
-          list[i]["iswithdrawal"]);
-      trxnModel.setUserId(list[i]["id"]);
+        list[i]["trxnAmount"],
+        list[i]["trxnDate"],
+        list[i]["categoryId"],
+        list[i]["subCategoryId"],
+        list[i]["description"],
+        list[i]["imagePath"],
+        list[i]["lastModifiedDate"],
+      );
+      trxnModel.setTrxnId(list[i]["trxnId"]);
       trxnList.add(trxnModel);
     }
     print(trxnList.length);
@@ -81,17 +100,19 @@ class DatabaseHelper {
   Future<List<TransactionModel>> getDailyTrxnList(String currentdate) async {
     var dbClient = await db;
     List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM TransactionDetail WHERE transactiondate = ?',
-        [currentdate]);
+        'SELECT * FROM Transactions WHERE transactiondate = ?', [currentdate]);
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
-          list[i]["transactionname"],
-          list[i]["transactionamount"],
-          list[i]["transactiondate"],
-          list[i]["transactioncategory"],
-          list[i]["iswithdrawal"]);
-      trxnModel.setUserId(list[i]["id"]);
+        list[i]["trxnAmount"],
+        list[i]["trxnDate"],
+        list[i]["categoryId"],
+        list[i]["subCategoryId"],
+        list[i]["description"],
+        list[i]["imagePath"],
+        list[i]["lastModifiedDate"],
+      );
+      trxnModel.setTrxnId(list[i]["trxnId"]);
       trxnList.add(trxnModel);
     }
     print(trxnList.length);
@@ -100,18 +121,19 @@ class DatabaseHelper {
 
   Future<List<TransactionModel>> getMonthlyTrxnList() async {
     var dbClient = await db;
-    String sql =
-        'SELECT * FROM TransactionDetail WHERE CAST(transactiondate AS DATE) >= \'10-03-2020\';';
-    List<Map> list = await dbClient.rawQuery(sql);
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM Transactions');
     List<TransactionModel> trxnList = new List();
     for (int i = 0; i < list.length; i++) {
       var trxnModel = new TransactionModel(
-          list[i]["transactionname"],
-          list[i]["transactionamount"],
-          list[i]["transactiondate"],
-          list[i]["transactioncategory"],
-          (list[i]["iswithdrawal"] == 1));
-      trxnModel.setUserId(list[i]["id"]);
+        list[i]["trxnAmount"],
+        list[i]["trxnDate"],
+        list[i]["categoryId"],
+        list[i]["subCategoryId"],
+        list[i]["description"],
+        list[i]["imagePath"],
+        list[i]["lastModifiedDate"],
+      );
+      trxnModel.setTrxnId(list[i]["trxnId"]);
       trxnList.add(trxnModel);
     }
     print(trxnList.length);
@@ -120,14 +142,14 @@ class DatabaseHelper {
 
   Future<int> deleteTrxn(TransactionModel trxnModel) async {
     var dbClient = await db;
-    int res = await dbClient.rawDelete(
-        'DELETE FROM TransactionDetail WHERE id = ?', [trxnModel.trxnId]);
+    int res = await dbClient
+        .rawDelete('DELETE FROM Transactions WHERE id = ?', [trxnModel.trxnId]);
     return res;
   }
 
   Future<bool> update(TransactionModel trxnModel) async {
     var dbClient = await db;
-    int res = await dbClient.update("TransactionDetail", trxnModel.toMap(),
+    int res = await dbClient.update("Transactions", trxnModel.toMap(),
         where: "id = ?", whereArgs: <int>[trxnModel.trxnId]);
     return res > 0 ? true : false;
   }
@@ -135,16 +157,17 @@ class DatabaseHelper {
   Future<bool> createCategoryTable(Database db) async {
     // await db.execute('DROP TABLE IF EXISTS Category;');
     // await db.execute('DROP TABLE IF EXISTS SubCategory;');
+
     try {
       await db.rawQuery('SELECT * FROM Category');
     } catch (e) {
       // await db.execute('DROP TABLE IF EXISTS Category;');
       await db.execute(
-          "CREATE TABLE IF NOT EXISTS Category(category_Id INTEGER PRIMARY KEY AUTOINCREMENT, category_Name TEXT, category_type TEXT, logo TEXT, position INTEGER)");
+          "CREATE TABLE IF NOT EXISTS Category(categoryId INTEGER PRIMARY KEY AUTOINCREMENT, categoryName TEXT, categoryType INTEGER , logo TEXT, position INTEGER)");
       debugPrint('table created');
 
       await db.execute(
-          "CREATE TABLE IF NOT EXISTS SubCategory(subcategory_id INTEGER PRIMARY KEY AUTOINCREMENT, subcategory_name TEXT,category_id INTEGER,subcategory_type TEXT, logo TEXT, position INTEGER)");
+          "CREATE TABLE IF NOT EXISTS SubCategory(subCategoryId INTEGER PRIMARY KEY AUTOINCREMENT, subCategoryName TEXT,categoryId INTEGER, subCategoryType INTEGER , logo TEXT, position INTEGER)");
 
       await addCategoriesData();
     }
@@ -153,60 +176,61 @@ class DatabaseHelper {
 
   Future<bool> addCategoriesData() async {
     int catId = 0;
-    catId = await addCategory(new CategoryModel('Transportation', 1));
-    await addSubCategory(new SubCategoryModel('Railways', catId, 1));
-    await addSubCategory(new SubCategoryModel('Roadways', catId, 2));
-    await addSubCategory(new SubCategoryModel('Airways', catId, 3));
-    await addSubCategory(new SubCategoryModel('Waterways', catId, 4));
-    await addSubCategory(new SubCategoryModel('Pipelines', catId, 5));
+    catId = await addCategory(new CategoryModel('Transportation', 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Railways', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Roadways', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Airways', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Waterways', catId, 0, '', 4));
+    await addSubCategory(new SubCategoryModel('Pipelines', catId, 0, '', 5));
 
-    catId = await addCategory(new CategoryModel('Food', 2));
-    await addSubCategory(new SubCategoryModel('Lunch', catId, 1));
-    await addSubCategory(new SubCategoryModel('Dinner', catId, 2));
-    await addSubCategory(new SubCategoryModel('Eating out', catId, 3));
-    await addSubCategory(new SubCategoryModel('Beverages', catId, 4));
-    catId = await addCategory(new CategoryModel('Social Life', 3));
-    await addSubCategory(new SubCategoryModel('Friend', catId, 1));
-    await addSubCategory(new SubCategoryModel('Fellowship', catId, 2));
-    await addSubCategory(new SubCategoryModel('Alumni', catId, 3));
-    await addSubCategory(new SubCategoryModel('Dues', catId, 4));
+    catId = await addCategory(new CategoryModel('Food', 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Lunch', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Dinner', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Eating out', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Beverages', catId, 0, '', 4));
+    catId = await addCategory(new CategoryModel('Social Life', 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Friend', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Fellowship', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Alumni', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Dues', catId, 0, '', 4));
 
-    catId = await addCategory(new CategoryModel('Self-Development', 4));
-    catId = await addCategory(new CategoryModel('Culture', 5));
-    await addSubCategory(new SubCategoryModel('Books', catId, 1));
-    await addSubCategory(new SubCategoryModel('Movie', catId, 2));
-    await addSubCategory(new SubCategoryModel('Music', catId, 3));
-    await addSubCategory(new SubCategoryModel('Apps', catId, 4));
-    catId = await addCategory(new CategoryModel('Houserhold', 6));
-    await addSubCategory(new SubCategoryModel('Appliances', catId, 1));
-    await addSubCategory(new SubCategoryModel('Furniture', catId, 2));
-    await addSubCategory(new SubCategoryModel('Kitchen', catId, 3));
-    await addSubCategory(new SubCategoryModel('Toiletries', catId, 4));
-    await addSubCategory(new SubCategoryModel('Chandlery', catId, 5));
-    catId = await addCategory(new CategoryModel('Apparel', 7));
+    catId = await addCategory(new CategoryModel('Self-Development', 0, '', 4));
+    catId = await addCategory(new CategoryModel('Culture', 0, '', 5));
+    await addSubCategory(new SubCategoryModel('Books', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Movie', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Music', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Apps', catId, 0, '', 4));
+    catId = await addCategory(new CategoryModel('Houserhold', 0, '', 6));
+    await addSubCategory(new SubCategoryModel('Appliances', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Furniture', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Kitchen', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Toiletries', catId, 0, '', 4));
+    await addSubCategory(new SubCategoryModel('Chandlery', catId, 0, '', 5));
+    catId = await addCategory(new CategoryModel('Apparel', 0, '', 7));
 
-    await addSubCategory(new SubCategoryModel('Clothing', catId, 1));
-    await addSubCategory(new SubCategoryModel('Fashion', catId, 2));
-    await addSubCategory(new SubCategoryModel('Shoes', catId, 3));
-    await addSubCategory(new SubCategoryModel('Laundry', catId, 4));
-    catId = await addCategory(new CategoryModel('Beauty', 8));
-    await addSubCategory(new SubCategoryModel('Cosmetics', catId, 1));
-    await addSubCategory(new SubCategoryModel('Makeup', catId, 2));
-    await addSubCategory(new SubCategoryModel('Accessories', catId, 3));
-    await addSubCategory(new SubCategoryModel('Beauty', catId, 4));
-    catId = await addCategory(new CategoryModel('Health', 9));
-    await addSubCategory(new SubCategoryModel('Health', catId, 1));
-    await addSubCategory(new SubCategoryModel('Yoga', catId, 2));
-    await addSubCategory(new SubCategoryModel('Hospital', catId, 3));
-    await addSubCategory(new SubCategoryModel('Medicine', catId, 4));
-    catId = await addCategory(new CategoryModel('Education', 10));
-    await addSubCategory(new SubCategoryModel('Schooling', catId, 1));
-    await addSubCategory(new SubCategoryModel('Textbooks', catId, 2));
-    await addSubCategory(new SubCategoryModel('School suppies', catId, 3));
-    await addSubCategory(new SubCategoryModel('Academy', catId, 4));
-    catId = await addCategory(new CategoryModel('Gift', 11));
-    catId = await addCategory(new CategoryModel('Other', 12));
-    await getCategoryList();
+    await addSubCategory(new SubCategoryModel('Clothing', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Fashion', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Shoes', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Laundry', catId, 0, '', 4));
+    catId = await addCategory(new CategoryModel('Beauty', 0, '', 8));
+    await addSubCategory(new SubCategoryModel('Cosmetics', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Makeup', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Accessories', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Beauty', catId, 0, '', 4));
+    catId = await addCategory(new CategoryModel('Health', 0, '', 9));
+    await addSubCategory(new SubCategoryModel('Health', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Yoga', catId, 0, '', 2));
+    await addSubCategory(new SubCategoryModel('Hospital', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Medicine', catId, 0, '', 4));
+    catId = await addCategory(new CategoryModel('Education', 0, '', 10));
+    await addSubCategory(new SubCategoryModel('Schooling', catId, 0, '', 1));
+    await addSubCategory(new SubCategoryModel('Textbooks', catId, 0, '', 2));
+    await addSubCategory(
+        new SubCategoryModel('School suppies', catId, 0, '', 3));
+    await addSubCategory(new SubCategoryModel('Academy', catId, 0, '', 4));
+    catId = await addCategory(new CategoryModel('Gift', 0, '', 11));
+    catId = await addCategory(new CategoryModel('Other', 0, '', 12));
+    // await getCategoryList();
 
     return true;
   }
@@ -239,10 +263,12 @@ class DatabaseHelper {
     for (int i = 0; i < list.length; i++) {
       var categoryModel = new CategoryModel(
         list[i]["categoryName"],
+        list[i]["categoryType"],
+        list[i]["logo"],
         list[i]["position"],
       );
       categoryModel.setCategoryId(list[i]["categoryId"]);
-      print(list[i].toString());
+      // print(list[i].toString());
       categoryList.add(categoryModel);
     }
     categoryList.sort((a, b) => a.position.compareTo(b.position));
@@ -283,6 +309,8 @@ class DatabaseHelper {
       var categoryModel = new SubCategoryModel(
         list[i]["subCategoryName"],
         list[i]["categoryId"],
+        list[i]["subCategoryType"],
+        list[i]["logo"],
         list[i]["position"],
       );
       categoryModel.setSubCategoryId(list[i]["subCategoryId"]);

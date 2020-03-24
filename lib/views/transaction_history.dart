@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
+import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/add_expenses.dart';
 import 'package:moneymanager/views/calendar_trxns.dart';
 
@@ -35,7 +36,7 @@ class TransactionHistoryState extends State<TransactionHistory>
 
   Widget getListTile(TransactionModel model) {
     String imageAsset = '';
-    switch (model.trxnCategory) {
+    switch (model.categoryId.toString()) {
       case "Investment":
         imageAsset = 'assets/rent.svg';
         break;
@@ -71,7 +72,7 @@ class TransactionHistoryState extends State<TransactionHistory>
         ),
       ),
       title: Text(
-        model.trxnName,
+        model.description,
         style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
       ),
       subtitle: Row(
@@ -88,9 +89,9 @@ class TransactionHistoryState extends State<TransactionHistory>
         ],
       ),
       trailing: Text(
-        model.trxnAmount,
+        model.trxnAmount.toString(),
         style: TextStyle(
-            color: model.isWithDrawal ? Colors.redAccent : Colors.greenAccent,
+            color: Colors.greenAccent,
             fontWeight: FontWeight.w600),
       ),
     );
@@ -279,33 +280,33 @@ class TransactionHistoryState extends State<TransactionHistory>
       '12-03-2020',
       '02-03-2020'
     ];
-    var typeList = [false, true];
-    var db = new DatabaseHelper();
-    final _random = new Random();
-    var categoryElement = categoryList[_random.nextInt(categoryList.length)];
-    var amountElement = amountList[_random.nextInt(amountList.length)];
-    var titleElement = titleList[_random.nextInt(titleList.length)];
-    var dateElement = dateList[_random.nextInt(dateList.length)];
-    var typeElement = typeList[_random.nextInt(typeList.length)];
-    var transaction = new TransactionModel(
-        titleElement, amountElement, dateElement, categoryElement, typeElement);
-    int insertValue = await db.saveTransaction(transaction);
-    if (insertValue > 0) {
-      setState(() {
-        trxnListBloc.updateTrxnList();
-      });
-    }
-    debugPrint('Insert Value is: $insertValue');
+    // var typeList = [false, true];
+    // var db = new DatabaseHelper();
+    // final _random = new Random();
+    // var categoryElement = categoryList[_random.nextInt(categoryList.length)];
+    // var amountElement = amountList[_random.nextInt(amountList.length)];
+    // var titleElement = titleList[_random.nextInt(titleList.length)];
+    // var dateElement = dateList[_random.nextInt(dateList.length)];
+    // var typeElement = typeList[_random.nextInt(typeList.length)];
+    // var transaction = new TransactionModel(
+    //     titleElement, amountElement, dateElement, categoryElement, typeElement);
+    // int insertValue = await db.saveTransaction(transaction);
+    // if (insertValue > 0) {
+    //   setState(() {
+    //     trxnListBloc.updateTrxnList();
+    //   });
+    // }
+    // debugPrint('Insert Value is: $insertValue');
   }
 }
 
 class TrxnListBloc {
   StreamController<List<TransactionModel>> controller =
       new StreamController.broadcast();
-  var db = new DatabaseHelper();
+  // var db = new DatabaseHelper();
 
   void updateTrxnList() async {
-    List<TransactionModel> trxnList = await db.getTrxnList();
+    List<TransactionModel> trxnList = await databaseHelper.getTrxnList();
     controller.sink.add(trxnList);
   }
 

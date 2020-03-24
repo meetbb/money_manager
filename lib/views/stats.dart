@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
+import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/uiwidgets/trxn_chart.dart';
 import 'package:flutter/src/painting/text_style.dart' as textlib;
 import 'package:flutter/src/painting/basic_types.dart' as basicdesign;
@@ -65,25 +66,25 @@ class _StatsPageState extends State<StatsPage> {
 
   Widget getListTile(TransactionModel model) {
     String imageAsset = '';
-    switch (model.trxnCategory) {
-      case "Investment":
-        imageAsset = 'assets/rent.svg';
-        break;
-      case "Food":
-        imageAsset = 'assets/food.svg';
-        break;
-      case "income":
-        imageAsset = 'assets/salary.svg';
-        break;
-      case "rent":
-        imageAsset = 'assets/rent.svg';
-        break;
-      case "shopping":
-        imageAsset = 'assets/shopping.svg';
-        break;
-      default:
-        imageAsset = 'assets/home.svg';
-    }
+    // switch (model.trxnCategory) {
+    //   case "Investment":
+    //     imageAsset = 'assets/rent.svg';
+    //     break;
+    //   case "Food":
+    //     imageAsset = 'assets/food.svg';
+    //     break;
+    //   case "income":
+    //     imageAsset = 'assets/salary.svg';
+    //     break;
+    //   case "rent":
+    //     imageAsset = 'assets/rent.svg';
+    //     break;
+    //   case "shopping":
+    //     imageAsset = 'assets/shopping.svg';
+    //     break;
+    //   default:
+    //     imageAsset = 'assets/home.svg';
+    // }
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       leading: Container(
@@ -101,7 +102,7 @@ class _StatsPageState extends State<StatsPage> {
         ),
       ),
       title: Text(
-        model.trxnName,
+        model.description,
         style: textlib.TextStyle(
             color: Colors.black87, fontWeight: FontWeight.bold),
       ),
@@ -119,9 +120,9 @@ class _StatsPageState extends State<StatsPage> {
         ],
       ),
       trailing: Text(
-        model.trxnAmount,
+        model.trxnAmount.toString(),
         style: textlib.TextStyle(
-            color: model.isWithDrawal ? Colors.redAccent : Colors.greenAccent,
+            color: Colors.greenAccent,
             fontWeight: FontWeight.w600),
       ),
     );
@@ -180,11 +181,11 @@ class TrxnData {
 class TrxnListBloc {
   StreamController<List<TransactionModel>> controller =
       new StreamController.broadcast();
-  var db = new DatabaseHelper();
+  // var db = new DatabaseHelper();
 
   void updateTrxnList() async {
     // List<TransactionModel> trxnList = await db.getDailyTrxnList("24-03-2020");
-    List<TransactionModel> trxnList = await db.getMonthlyTrxnList();
+    List<TransactionModel> trxnList = await databaseHelper.getMonthlyTrxnList();
     controller.sink.add(trxnList);
   }
 
@@ -198,10 +199,10 @@ class TrxnListBloc {
 class TrxnChartBloc {
   StreamController<List<TransactionModel>> controller =
       new StreamController.broadcast();
-  var db = new DatabaseHelper();
+  // var db = new DatabaseHelper();
 
   void updateTrxnList() async {
-    List<TransactionModel> trxnList = await db.getDailyTrxnList("24-03-2020");
+    List<TransactionModel> trxnList = await databaseHelper.getDailyTrxnList("24-03-2020");
     controller.sink.add(trxnList);
   }
 
