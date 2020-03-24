@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
 import 'package:moneymanager/views/calendar_trxns.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class TransactionHistory extends StatefulWidget {
   @override
@@ -16,44 +18,71 @@ class TransactionHistory extends StatefulWidget {
 class TransactionHistoryState extends State<TransactionHistory>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
+  final trxnListBloc = TrxnListBloc();
 
-  Widget getListCard() {
+  Widget getListCard(TransactionModel model) {
     return Card(
-      elevation: 2.0,
-      margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+      margin: new EdgeInsets.only(top: 10, left: 10, right: 10.0),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
       child: Container(
         decoration: BoxDecoration(color: Colors.white70),
-        child: getListTile(),
+        child: getListTile(model),
       ),
     );
   }
 
-  Widget getListTile() {
+  Widget getListTile(TransactionModel model) {
+    String imageAsset = '';
+    switch (model.trxnCategory) {
+      case "Investment":
+        imageAsset = 'assets/rent.svg';
+        break;
+        case "Food":
+        imageAsset = 'assets/food.svg';
+        break;
+        case "income":
+        imageAsset = 'assets/salary.svg';
+        break;
+        case "rent":
+        imageAsset = 'assets/rent.svg';
+        break;
+        case "shopping":
+        imageAsset = 'assets/shopping.svg';
+        break;
+      default:
+      imageAsset = 'assets/home.svg';
+    }
     return ListTile(
       contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
       leading: Container(
-        padding: EdgeInsets.only(right: 12.0),
         decoration: new BoxDecoration(
-          border: new Border(
-            right: new BorderSide(width: 1.0, color: Colors.black12),
+          shape: BoxShape.circle,
+          color: Colors.redAccent,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: SvgPicture.asset(
+            imageAsset,
+            width: 22,
+            height: 22,
           ),
         ),
-        child: Icon(Icons.money_off, color: Colors.black87),
       ),
       title: Text(
-        "For food donation",
+        model.trxnName,
         style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
       ),
-      // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
 
       subtitle: Column(
         children: <Widget>[
           Row(
             children: <Widget>[
               Icon(Icons.linear_scale, color: Colors.orangeAccent),
-              Text(" Rs. 2000",
-                  style: TextStyle(
-                      color: Colors.black87, fontStyle: FontStyle.italic))
+              Text(
+                model.trxnAmount,
+                style: TextStyle(
+                    color: Colors.black87, fontStyle: FontStyle.italic),
+              )
             ],
           ),
           SizedBox(
@@ -66,7 +95,7 @@ class TransactionHistoryState extends State<TransactionHistory>
                 color: Colors.orangeAccent,
                 size: 16,
               ),
-              Text(" 10 March, 2020", style: TextStyle(color: Colors.black87))
+              Text(model.trxnDate, style: TextStyle(color: Colors.black87))
             ],
           ),
         ],
@@ -115,28 +144,39 @@ class TransactionHistoryState extends State<TransactionHistory>
   ];
 
   Widget getTrxnList() {
-    return Container(
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: 10,
-        itemBuilder: (BuildContext context, int index) {
-          return StickyHeader(
-            header: Container(
-              height: 30.0,
-              color: Colors.grey[200],
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                getDatesArray()[index],
-                style: const TextStyle(color: Colors.black87),
+    return StreamBuilder<List<TransactionModel>>(
+        stream: trxnListBloc.trxnModelListStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Container(
+              color: Colors.grey[100],
+              child: ListView.builder(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  TransactionModel model = snapshot.data[index];
+                  return getListCard(model);
+                  // return StickyHeader(
+                  //   header: Container(
+                  //     height: 30.0,
+                  //     color: Colors.grey[200],
+                  //     padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  //     alignment: Alignment.centerLeft,
+                  //     child: Text(
+                  //       model.trxnDate,
+                  //       style: const TextStyle(color: Colors.black87),
+                  //     ),
+                  //   ),
+                  //   content: getListCard(model),
+                  // );
+                },
               ),
-            ),
-            content: getListCard(),
-          );
-        },
-      ),
-    );
+            );
+          } else {
+            return Container();
+          }
+        });
   }
 
   List<Widget> getTabViewWidgets() {
@@ -167,6 +207,16 @@ class TransactionHistoryState extends State<TransactionHistory>
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: tabs.length);
+    trxnListBloc.updateTrxnList();
+    _tabController.addListener(() {
+      trxnListBloc.updateTrxnList();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    trxnListBloc.dispose();
   }
 
   @override
@@ -217,7 +267,28 @@ class TransactionHistoryState extends State<TransactionHistory>
     var transaction = new TransactionModel(
         "New MF Purchase", "£ 200", "20-03-2020", "Investment");
     int insertValue = await db.saveTransaction(transaction);
+    if (insertValue > 0) {
+      setState(() {
+        trxnListBloc.updateTrxnList();
+      });
+    }
     debugPrint('Insert Value is: $insertValue');
   }
 }
 
+class TrxnListBloc {
+  StreamController<List<TransactionModel>> controller =
+      new StreamController.broadcast();
+  var db = new DatabaseHelper();
+
+  void updateTrxnList() async {
+    List<TransactionModel> trxnList = await db.getTrxnList();
+    controller.sink.add(trxnList);
+  }
+
+  void dispose() {
+    controller.close();
+  }
+
+  Stream get trxnModelListStream => controller.stream;
+}

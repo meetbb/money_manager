@@ -57,6 +57,57 @@ class DatabaseHelper {
     return trxnList;
   }
 
+  Future<List<TransactionModel>> getTrxnByCategory(String category) async {
+    var dbClient = await db;
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail');
+    List<TransactionModel> trxnList = new List();
+    for (int i = 0; i < list.length; i++) {
+      var trxnModel = new TransactionModel(
+          list[i]["transactionname"],
+          list[i]["transactionamount"],
+          list[i]["transactiondate"],
+          list[i]["transactioncategory"]);
+      trxnModel.setUserId(list[i]["id"]);
+      trxnList.add(trxnModel);
+    }
+    print(trxnList.length);
+    return trxnList;
+  }
+
+  Future<List<TransactionModel>> getDailyTrxnList(String currentdate) async {
+    var dbClient = await db;
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail WHERE transactiondate = ?', [currentdate]);
+    List<TransactionModel> trxnList = new List();
+    for (int i = 0; i < list.length; i++) {
+      var trxnModel = new TransactionModel(
+          list[i]["transactionname"],
+          list[i]["transactionamount"],
+          list[i]["transactiondate"],
+          list[i]["transactioncategory"]);
+      trxnModel.setUserId(list[i]["id"]);
+      trxnList.add(trxnModel);
+    }
+    print(trxnList.length);
+    return trxnList;
+  }
+
+  Future<List<TransactionModel>> getMonthlyTrxnList() async {
+    var dbClient = await db;
+    List<Map> list = await dbClient.rawQuery('SELECT * FROM TransactionDetail');
+    List<TransactionModel> trxnList = new List();
+    for (int i = 0; i < list.length; i++) {
+      var trxnModel = new TransactionModel(
+          list[i]["transactionname"],
+          list[i]["transactionamount"],
+          list[i]["transactiondate"],
+          list[i]["transactioncategory"]);
+      trxnModel.setUserId(list[i]["id"]);
+      trxnList.add(trxnModel);
+    }
+    print(trxnList.length);
+    return trxnList;
+  }
+
   Future<int> deleteTrxn(TransactionModel trxnModel) async {
     var dbClient = await db;
     int res = await dbClient.rawDelete(
