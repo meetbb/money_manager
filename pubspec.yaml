@@ -57,6 +57,7 @@ flutter:
    - home.svg
    - rent.svg
    - salary.svg
+   - rupee.svg
    - shopping.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see

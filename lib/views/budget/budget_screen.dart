@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:moneymanager/views/budget/add_budget_screen.dart';
+import 'package:moneymanager/views/uiwidgets/category_icons.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class BudgetScreen extends StatefulWidget {
@@ -24,6 +25,15 @@ class BudgetScreenState extends State<BudgetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddBudgetScreen()),
+          );
+        },
+      ),
       body: SafeArea(
         child: Column(
           children: <Widget>[
@@ -34,8 +44,9 @@ class BudgetScreenState extends State<BudgetScreen> {
                     height: MediaQuery.of(context).size.height / 2,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(75),
-                          bottomRight: Radius.circular(75)),
+                        bottomLeft: Radius.circular(75),
+                        bottomRight: Radius.circular(75),
+                      ),
                       color: Colors.blue[700],
                     ),
                     child: Center(
@@ -172,7 +183,7 @@ class BudgetScreenState extends State<BudgetScreen> {
                                       HeaderText(text: 'BUDGET DISTRIBUTION'),
                                 ),
                                 GridView.builder(
-                                    itemCount: 209,
+                                    itemCount: 9,
                                     shrinkWrap: true,
                                     physics: BouncingScrollPhysics(),
                                     gridDelegate:
@@ -181,21 +192,21 @@ class BudgetScreenState extends State<BudgetScreen> {
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       return new Card(
-                                          child: Container(
-                                        width: 25,
-                                        height: 25,
-                                        decoration: new BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.redAccent,
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(10.0),
-                                          child: SvgPicture.asset(
-                                            'assets/shopping.svg',
-                                            width: 10,
-                                            height: 10,
-                                          ),
-                                        ),
+                                          child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          (index % 2 == 0)
+                                              ? RentWidget()
+                                              : ShoppingWidget(),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8.0),
+                                            child: ValueText(text: 'Rs. 1000'),
+                                          )
+                                        ],
                                       ));
                                     })
                               ],
@@ -247,15 +258,16 @@ class ValueText extends StatelessWidget {
 
 class HeaderText extends StatelessWidget {
   final String text;
+  final Color fontColor;
 
-  HeaderText({@required this.text});
+  HeaderText({@required this.text, this.fontColor = Colors.black87});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       style: TextStyle(
-          color: Colors.black87, fontWeight: FontWeight.w400, fontSize: 19),
+          color: this.fontColor, fontWeight: FontWeight.w400, fontSize: 19),
     );
   }
 }

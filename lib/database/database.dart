@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:flutter/cupertino.dart';
+import 'package:moneymanager/database/model/budget_model.dart';
 import 'package:moneymanager/database/model/category_model.dart';
 import 'package:moneymanager/database/model/subcategory_model.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
@@ -14,6 +15,15 @@ class DatabaseHelper {
   factory DatabaseHelper() => _instance;
   static Database _db;
   DatabaseHelper.internal();
+  static const String BUDGET_TABLE_NAME = "Budget";
+  static const String BUDGET_ID_KEY = "BudgetId";
+  static const String BUDGET_NAME_KEY = "BudgetName";
+  static const String BUDGET_AMOUNT_KEY = "BudgetAmount";
+  static const String BUDGET_CATEGORY_KEY = "BudgetCategory";
+  static const String BUDGET_RECURRENCE_KEY = "BudgetRecurrence";
+  static const String BUDGET_START_DATE_KEY = "BudgetStartDate";
+  static const String BUDGET_END_DATE_KEY = "BudgetEndDate";
+  static const String BUDGET_NOTIFY_KEY = "BudgetNotifications";
 
   Future<Database> get db async {
     if (_db != null) return _db;
@@ -152,6 +162,39 @@ class DatabaseHelper {
     int res = await dbClient.update("Transactions", trxnModel.toMap(),
         where: "id = ?", whereArgs: <int>[trxnModel.trxnId]);
     return res > 0 ? true : false;
+  }
+
+  /// Creating the Table for Budget
+  Future<bool> createBudgetTable() async {
+    var dbClient = await db;
+    await dbClient.execute(
+        "CREATE TABLE IF NOT EXISTS $BUDGET_TABLE_NAME($BUDGET_ID_KEY INTEGER PRIMARY KEY AUTOINCREMENT, $BUDGET_NAME_KEY TEXT, $BUDGET_AMOUNT_KEY TEXT, $BUDGET_CATEGORY_KEY TEXT, $BUDGET_RECURRENCE_KEY TEXT, $BUDGET_START_DATE_KEY TEXT, $BUDGET_END_DATE_KEY TEXT, $BUDGET_NOTIFY_KEY TEXT)");
+    return true;
+  }
+
+  Future<int> saveBudget(BudgetModel budgetModel) async {
+    var dbClient = await db;
+    int res = await dbClient.insert(BUDGET_TABLE_NAME, budgetModel.toMap());
+    return res;
+  }
+
+  ///Get Budget Date from Key
+  Future<BudgetModel> getBudgetData(int budgetId) async {
+    var dbClient = await db;
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT * FROM $BUDGET_TABLE_NAME WHERE $BUDGET_ID_KEY = ?',
+        [budgetId]);
+    var budgetModel = new BudgetModel(
+      list[0][BUDGET_ID_KEY],
+      list[0][BUDGET_NAME_KEY],
+      list[0][BUDGET_AMOUNT_KEY],
+      list[0][BUDGET_CATEGORY_KEY],
+      list[0][BUDGET_RECURRENCE_KEY],
+      list[0][BUDGET_START_DATE_KEY],
+      list[0][BUDGET_END_DATE_KEY],
+      list[0][BUDGET_NOTIFY_KEY],
+    );
+    return budgetModel;
   }
 
   Future<bool> createCategoryTable(Database db) async {

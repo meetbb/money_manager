@@ -7,8 +7,9 @@ import 'package:intl/intl.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/add_expenses.dart';
-import 'package:moneymanager/views/budget_screen.dart';
 import 'package:moneymanager/views/calendar_trxns.dart';
+
+import 'budget/budget_screen.dart';
 
 class TransactionHistory extends StatefulWidget {
   @override
