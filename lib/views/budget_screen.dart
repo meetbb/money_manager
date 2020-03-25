@@ -83,128 +83,126 @@ class BudgetScreenState extends State<BudgetScreen> {
                     top: MediaQuery.of(context).size.height / 2 - 50,
                     left: 15,
                     right: 15,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: <Widget>[
-                          Card(
-                            margin: new EdgeInsets.only(
-                                top: 10, left: 10, right: 10.0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
+                    bottom: 0,
+                    child: Column(
+                      children: <Widget>[
+                        Expanded(
+                          child: SingleChildScrollView(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: <Widget>[
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
-                                  child: Text(
-                                    'March 2020',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.black87,
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.w300),
+                                Card(
+                                  margin: new EdgeInsets.only(
+                                      top: 10, left: 10, right: 10.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40),
-                                  child: Container(
-                                    width: 60,
-                                    height: 1,
-                                    color: Colors.grey[200],
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 15),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
                                     children: <Widget>[
-                                      Column(
-                                        children: <Widget>[
-                                          DescText(labelValue: 'Projection'),
-                                          SizedBox(
-                                            height: 8.0,
-                                          ),
-                                          ValueText(text: '₹ 25,000')
-                                        ],
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 15),
+                                        child: Text(
+                                          'March 2020',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontSize: 22,
+                                              fontWeight: FontWeight.w300),
+                                        ),
                                       ),
-                                      Column(
-                                        children: <Widget>[
-                                          DescText(labelValue: 'Daily Budget'),
-                                          SizedBox(
-                                            height: 8.0,
-                                          ),
-                                          ValueText(text: '₹ 1000')
-                                        ],
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 40),
+                                        child: Container(
+                                          width: 60,
+                                          height: 1,
+                                          color: Colors.grey[200],
+                                        ),
                                       ),
-                                      Column(
-                                        children: <Widget>[
-                                          DescText(labelValue: 'Total spent'),
-                                          SizedBox(
-                                            height: 8.0,
-                                          ),
-                                          ValueText(text: '₹ 250')
-                                        ],
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 15),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: <Widget>[
+                                            Column(
+                                              children: <Widget>[
+                                                DescText(
+                                                    labelValue: 'Projection'),
+                                                SizedBox(
+                                                  height: 8.0,
+                                                ),
+                                                ValueText(text: '₹ 25,000')
+                                              ],
+                                            ),
+                                            Column(
+                                              children: <Widget>[
+                                                DescText(
+                                                    labelValue: 'Daily Budget'),
+                                                SizedBox(
+                                                  height: 8.0,
+                                                ),
+                                                ValueText(text: '₹ 1000')
+                                              ],
+                                            ),
+                                            Column(
+                                              children: <Widget>[
+                                                DescText(
+                                                    labelValue: 'Total spent'),
+                                                SizedBox(
+                                                  height: 8.0,
+                                                ),
+                                                ValueText(text: '₹ 250')
+                                              ],
+                                            )
+                                          ],
+                                        ),
                                       )
                                     ],
                                   ),
-                                )
+                                ),
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 20),
+                                  child:
+                                      HeaderText(text: 'BUDGET DISTRIBUTION'),
+                                ),
+                                GridView.builder(
+                                    itemCount: 209,
+                                    shrinkWrap: true,
+                                    physics: BouncingScrollPhysics(),
+                                    gridDelegate:
+                                        SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 3),
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      return new Card(
+                                          child: Container(
+                                        width: 25,
+                                        height: 25,
+                                        decoration: new BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.redAccent,
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: SvgPicture.asset(
+                                            'assets/shopping.svg',
+                                            width: 10,
+                                            height: 10,
+                                          ),
+                                        ),
+                                      ));
+                                    })
                               ],
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            child: HeaderText(text: 'BUDGET DISTRIBUTION'),
-                          ),
-                          GridView.builder(
-                              itemCount: 9,
-                              shrinkWrap: true,
-                              physics: BouncingScrollPhysics(),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3),
-                              itemBuilder: (BuildContext context, int index) {
-                                return new Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: new BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: Colors.redAccent,
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(7.0),
-                                            child: SvgPicture.asset(
-                                              'assets/shopping.svg',
-                                              width: 25,
-                                              height: 25,
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: ValueText(text: '₹ 1000'),
-                                        )
-                                      ],
-                                    ));
-                              })
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
