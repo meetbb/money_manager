@@ -170,22 +170,38 @@ class BudgetScreenState extends State<BudgetScreen> {
                                       crossAxisCount: 3),
                               itemBuilder: (BuildContext context, int index) {
                                 return new Card(
-                                    child: Container(
-                                  width: 25,
-                                  height: 25,
-                                  decoration: new BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.redAccent,
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: SvgPicture.asset(
-                                      'assets/shopping.svg',
-                                      width: 10,
-                                      height: 10,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
                                     ),
-                                  ),
-                                ));
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: new BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Colors.redAccent,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(7.0),
+                                            child: SvgPicture.asset(
+                                              'assets/shopping.svg',
+                                              width: 25,
+                                              height: 25,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: ValueText(text: '₹ 1000'),
+                                        )
+                                      ],
+                                    ));
                               })
                         ],
                       ),
@@ -245,4 +261,3 @@ class HeaderText extends StatelessWidget {
     );
   }
 }
-

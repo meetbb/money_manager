@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:bubble_tab_indicator/bubble_tab_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/add_expenses.dart';
+import 'package:moneymanager/views/budget_screen.dart';
 import 'package:moneymanager/views/calendar_trxns.dart';
 
 class TransactionHistory extends StatefulWidget {
@@ -90,9 +89,8 @@ class TransactionHistoryState extends State<TransactionHistory>
       ),
       trailing: Text(
         model.trxnAmount.toString(),
-        style: TextStyle(
-            color: Colors.greenAccent,
-            fontWeight: FontWeight.w600),
+        style:
+            TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -214,44 +212,48 @@ class TransactionHistoryState extends State<TransactionHistory>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0.1,
         backgroundColor: Colors.white,
-        title: Text(
-          'Transactions',
-          style: TextStyle(color: Colors.black87),
-        ),
-        bottom: new TabBar(
-          isScrollable: true,
-          unselectedLabelColor: Colors.grey,
-          labelColor: Colors.white,
-          indicatorSize: TabBarIndicatorSize.tab,
-          indicator: new BubbleTabIndicator(
-            indicatorHeight: 25.0,
-            indicatorColor: Colors.blueAccent,
-            tabBarIndicatorSize: TabBarIndicatorSize.tab,
+        appBar: AppBar(
+          elevation: 0.1,
+          backgroundColor: Colors.white,
+          title: Text(
+            'Transactions',
+            style: TextStyle(color: Colors.black87),
           ),
-          tabs: tabs,
-          controller: _tabController,
-        ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add_box,
-              color: Colors.black87,
+          bottom: new TabBar(
+            isScrollable: true,
+            unselectedLabelColor: Colors.grey,
+            labelColor: Colors.white,
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicator: new BubbleTabIndicator(
+              indicatorHeight: 25.0,
+              indicatorColor: Colors.blueAccent,
+              tabBarIndicatorSize: TabBarIndicatorSize.tab,
             ),
-            onPressed: () {
-              addRecord();
-            },
-          )
-        ],
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: getTabViewWidgets(),
-      ),
-      floatingActionButton: new FloatingActionButton(
+            tabs: tabs,
+            controller: _tabController,
+          ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(
+                Icons.add_box,
+                color: Colors.black87,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BudgetScreen()),
+                );
+                // addRecord();
+              },
+            )
+          ],
+        ),
+        body: TabBarView(
+          controller: _tabController,
+          children: getTabViewWidgets(),
+        ),
+        floatingActionButton: new FloatingActionButton(
           child: const Icon(Icons.add),
           onPressed: () {
             Navigator.push(
@@ -259,8 +261,7 @@ class TransactionHistoryState extends State<TransactionHistory>
               MaterialPageRoute(builder: (context) => AddExpensesPage()),
             );
           },
-        )
-    );
+        ));
   }
 
   Future addRecord() async {
