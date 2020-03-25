@@ -7,6 +7,8 @@ import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/category_list.dart';
 
 class CategorySelection extends StatefulWidget {
+  final int categoryType;
+  CategorySelection({Key key, this.categoryType});
   @override
   _CategorySelectionState createState() => _CategorySelectionState();
 }
@@ -21,7 +23,8 @@ class _CategorySelectionState extends State<CategorySelection> {
   }
 
   Future<List<CategoryModel>> getCategories() async {
-    List<CategoryModel> categoryList = await databaseHelper.getCategoryList();
+    List<CategoryModel> categoryList =
+        await databaseHelper.getCategoryList(widget.categoryType);
     // setState(() {});
     return categoryList;
   }
@@ -30,7 +33,10 @@ class _CategorySelectionState extends State<CategorySelection> {
     if (choice == 'Edit') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => CategoryListPage()),
+        MaterialPageRoute(
+            builder: (context) => CategoryListPage(
+                  categoryType: widget.categoryType,
+                )),
       );
     }
   }
@@ -39,7 +45,7 @@ class _CategorySelectionState extends State<CategorySelection> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-          title: new Text("Category/Sub Category"),
+          title: new Text("Category / Sub Category"),
           actions: <Widget>[
             PopupMenuButton<String>(
               onSelected: choiceAction,
@@ -65,7 +71,7 @@ class _CategorySelectionState extends State<CategorySelection> {
                     },
                     itemCount: snapshot.data.length,
                   )
-                : CircularProgressIndicator();
+                : Center(child: CircularProgressIndicator());
           }),
     );
   }

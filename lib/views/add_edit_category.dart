@@ -6,6 +6,7 @@ import 'package:moneymanager/database/model/subcategory_model.dart';
 import 'package:moneymanager/utilities/constants.dart';
 
 class AddEditCategoryPage extends StatefulWidget {
+  int categoryType;
   bool isEdit = false;
   bool isCategory = true;
   CategoryModel category;
@@ -17,7 +18,7 @@ class AddEditCategoryPage extends StatefulWidget {
   AddEditCategoryPage(
       {Key key,
       @required this.isEdit,
-      // this.editIndex,
+      this.categoryType,
       this.isCategory,
       this.category,
       this.subCategory});
@@ -116,11 +117,11 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                       } else {
                         if (widget.isCategory == true) {
                           List<CategoryModel> categoryList =
-                              await databaseHelper.getCategoryList();
+                              await databaseHelper.getCategoryList(widget.categoryType);
 
                           databaseHelper.addCategory(new CategoryModel(
                             categoryNameController.text,
-                            0,
+                            widget.categoryType,
                             '',
                             categoryList.last.position + 1,
                           ));

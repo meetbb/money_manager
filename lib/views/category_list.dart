@@ -9,6 +9,12 @@ import 'package:moneymanager/views/add_edit_category.dart';
 import 'package:moneymanager/views/subcategory_list.dart';
 
 class CategoryListPage extends StatefulWidget {
+  final int categoryType;
+  CategoryListPage({
+    Key key,
+    this.categoryType,
+  });
+
   @override
   _CategoryListPageState createState() => _CategoryListPageState();
 }
@@ -34,7 +40,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
 
   getCategories() async {
     // await DatabaseHelper().createCategoryTable(await DatabaseHelper().db);
-    categoryList = await databaseHelper.getCategoryList();
+    categoryList = await databaseHelper.getCategoryList(widget.categoryType);
 
     setState(() {});
   }
@@ -53,7 +59,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Expenses Category'),
+          title: Text( widget.categoryType ==0 ? 'Expenses Category': 'Income Category'),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -65,12 +71,14 @@ class _CategoryListPageState extends State<CategoryListPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AddEditCategoryPage(
+                              categoryType: widget.categoryType,
                               isEdit: false,
                               isCategory: true,
                             )),
                   );
                   if (isAddOrEdit != null) {
-                    categoryList = await databaseHelper.getCategoryList();
+                    categoryList = await databaseHelper
+                        .getCategoryList(widget.categoryType);
 
                     setState(() {});
                   }
@@ -96,13 +104,16 @@ class _CategoryListPageState extends State<CategoryListPage> {
                             return GestureDetector(
                               onTap: () async {
                                 // if (subCategories.length > 0) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SubCategoryListPage(
-                                            category: categoryList[index],
-                                          )),
-                                );
+                                if (widget.categoryType == 0) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            SubCategoryListPage(
+                                              category: categoryList[index],
+                                            )),
+                                  );
+                                }
                                 // }
                               },
                               child: Column(
@@ -115,12 +126,11 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                           showAlertWithConfirmation(context,
                                               'Are you sure want to delete ?',
                                               () async {
-                                            databaseHelper
-                                                .deleteCategory(
-                                                    categoryList[index]);
-                                            categoryList =
-                                                await databaseHelper
-                                                    .getCategoryList();
+                                            databaseHelper.deleteCategory(
+                                                categoryList[index]);
+                                            categoryList = await databaseHelper
+                                                .getCategoryList(
+                                                    widget.categoryType);
                                             // categoryList.removeAt(index);
                                             setState(() {});
                                           });
@@ -156,6 +166,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     AddEditCategoryPage(
+                                                      categoryType: widget.categoryType,
                                                       isEdit: true,
                                                       isCategory: true,
                                                       category:
@@ -163,9 +174,9 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                                     )),
                                           );
                                           if (isAddOrEdit != null) {
-                                            categoryList =
-                                                await databaseHelper
-                                                    .getCategoryList();
+                                            categoryList = await databaseHelper
+                                                .getCategoryList(
+                                                    widget.categoryType);
                                             setState(() {});
                                           }
                                         },

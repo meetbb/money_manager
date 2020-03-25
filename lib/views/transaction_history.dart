@@ -255,11 +255,14 @@ class TransactionHistoryState extends State<TransactionHistory>
         ),
         floatingActionButton: new FloatingActionButton(
           child: const Icon(Icons.add),
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            bool isAddEdit = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => AddExpensesPage()),
             );
+            if (isAddEdit != null) {
+              trxnListBloc.updateTrxnList();
+            }
           },
         ));
   }

@@ -230,7 +230,15 @@ class DatabaseHelper {
     await addSubCategory(new SubCategoryModel('Academy', catId, 0, '', 4));
     catId = await addCategory(new CategoryModel('Gift', 0, '', 11));
     catId = await addCategory(new CategoryModel('Other', 0, '', 12));
-    // await getCategoryList();
+
+    catId = await addCategory(new CategoryModel('Salary', 1, '', 1));
+    catId = await addCategory(new CategoryModel('Allowance', 1, '', 2));
+    catId = await addCategory(new CategoryModel('Bonus', 1, '', 3));
+    catId = await addCategory(new CategoryModel('Rent', 1, '', 4));
+    catId = await addCategory(new CategoryModel('Pension', 1, '', 5));
+    catId = await addCategory(new CategoryModel('Other', 1, '', 6));
+
+    // await getCategoryList(1);
 
     return true;
   }
@@ -256,9 +264,10 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<List<CategoryModel>> getCategoryList() async {
+  Future<List<CategoryModel>> getCategoryList(int categoryType) async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM Category');
+    List<Map> list = await dbClient.rawQuery(
+        'SELECT * FROM Category WHERE categoryType = ?', [categoryType]);
     List<CategoryModel> categoryList = new List();
     for (int i = 0; i < list.length; i++) {
       var categoryModel = new CategoryModel(
