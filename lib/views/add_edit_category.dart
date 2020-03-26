@@ -98,7 +98,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                             widget.category.categoryName =
                                 categoryNameController.text;
 
-                            databaseHelper.editCategory(widget.category);
+                            databaseWrapper.editCategory(widget.category);
                           }
 
                           Navigator.pop(context, true);
@@ -110,14 +110,14 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                             widget.subCategory.subCategoryName =
                                 categoryNameController.text;
 
-                            databaseHelper.editSubCategory(widget.subCategory);
+                            databaseWrapper.editSubCategory(widget.subCategory);
                           }
                           Navigator.pop(context, true);
                         }
                       } else {
                         if (widget.isCategory == true) {
                           List<CategoryModel> categoryList =
-                              await databaseHelper.getCategoryList(widget.categoryType);
+                              await databaseWrapper.getCategoryList(widget.categoryType);
 
                           databaseHelper.addCategory(new CategoryModel(
                             categoryNameController.text,
@@ -129,7 +129,7 @@ class _AddEditCategoryPageState extends State<AddEditCategoryPage> {
                           Navigator.pop(context, true);
                         } else {
                           List<SubCategoryModel> subcategoryList =
-                              await  databaseHelper.getSubCategoryList(
+                              await  databaseWrapper.getSubCategoryList(
                                   widget.category.categoryId);
                           int position = 0;
                           if (subcategoryList.length > 0) {

@@ -31,7 +31,7 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
 
   getSubCategories() async {
     subCategoryList =
-        await databaseHelper.getSubCategoryList(widget.category.categoryId);
+        await databaseWrapper.getSubCategoryList(widget.category.categoryId);
 
     setState(() {});
   }

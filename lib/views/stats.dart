@@ -21,7 +21,7 @@ class _StatsPageState extends State<StatsPage> {
   @override
   void initState() {
     super.initState();
-    trxnListBloc.updateTrxnList();
+    // trxnListBloc.updateTrxnList();
   }
 
   @override
@@ -183,11 +183,11 @@ class TrxnListBloc {
       new StreamController.broadcast();
   // var db = new DatabaseHelper();
 
-  void updateTrxnList() async {
-    // List<TransactionModel> trxnList = await db.getDailyTrxnList("24-03-2020");
-    List<TransactionModel> trxnList = await databaseHelper.getMonthlyTrxnList();
-    controller.sink.add(trxnList);
-  }
+  // void updateTrxnList() async {
+  //   // List<TransactionModel> trxnList = await db.getDailyTrxnList("24-03-2020");
+  //   List<TransactionModel> trxnList = await databaseHelper.getMonthlyTrxnList();
+  //   controller.sink.add(trxnList);
+  // }
 
   void dispose() {
     controller.close();
@@ -201,10 +201,10 @@ class TrxnChartBloc {
       new StreamController.broadcast();
   // var db = new DatabaseHelper();
 
-  void updateTrxnList() async {
-    List<TransactionModel> trxnList = await databaseHelper.getDailyTrxnList("24-03-2020");
-    controller.sink.add(trxnList);
-  }
+  // void updateTrxnList() async {
+  //   List<TransactionModel> trxnList = await databaseWrapper.getTrxnListByDate('stDate', 'enDate');
+  //   controller.sink.add(trxnList);
+  // }
 
   void dispose() {
     controller.close();

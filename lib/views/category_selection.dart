@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/category_model.dart';
 import 'package:moneymanager/database/model/subcategory_model.dart';
+import 'package:moneymanager/database/model/transaction_model.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/category_list.dart';
 
 class CategorySelection extends StatefulWidget {
   final int categoryType;
+  // Function onSelection;
   CategorySelection({Key key, this.categoryType});
   @override
   _CategorySelectionState createState() => _CategorySelectionState();
@@ -24,7 +26,7 @@ class _CategorySelectionState extends State<CategorySelection> {
 
   Future<List<CategoryModel>> getCategories() async {
     List<CategoryModel> categoryList =
-        await databaseHelper.getCategoryList(widget.categoryType);
+        await databaseWrapper.getCategoryList(widget.categoryType);
     // setState(() {});
     return categoryList;
   }
@@ -43,33 +45,66 @@ class _CategorySelectionState extends State<CategorySelection> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-          title: new Text("Category / Sub Category"),
-          actions: <Widget>[
-            PopupMenuButton<String>(
-              onSelected: choiceAction,
-              itemBuilder: (BuildContext context) {
-                return ['Edit'].map((String choice) {
-                  return PopupMenuItem<String>(
-                    value: choice,
-                    child: Text(choice),
-                  );
-                }).toList();
-              },
-            )
-          ]),
-      body: FutureBuilder<List<CategoryModel>>(
+    return new Container(
+      decoration: new BoxDecoration(
+          color: Colors.white, //Color(0xFFefefef),
+          borderRadius: new BorderRadius.only(
+            topLeft: Radius.circular(20.0),
+            topRight: Radius.circular(20.0),
+          )),
+      // appBar: new AppBar(
+      //   backgroundColor: Colors.white,
+      //   elevation: 0,
+      //   title: new Text(
+      //     "Category / Sub Category",
+      //     style: TextStyle(color: Colors.black),
+      //   ),
+      //   // actions: <Widget>[
+      //   //   PopupMenuButton<String>(
+      //   //     onSelected: choiceAction,
+      //   //     itemBuilder: (BuildContext context) {
+      //   //       return ['Edit'].map((String choice) {
+      //   //         return PopupMenuItem<String>(
+      //   //           value: choice,
+      //   //           child: Text(choice),
+      //   //         );
+      //   //       }).toList();
+      //   //     },
+      //   //   )
+      //   // ]
+      // ),
+      child: FutureBuilder<List<CategoryModel>>(
           future: getCategories(), //
           builder: (BuildContext context,
               AsyncSnapshot<List<CategoryModel>> snapshot) {
             return snapshot.hasData
-                ? new ListView.builder(
-                    itemBuilder: (BuildContext context, int index) {
-                      return new ExpandableListView(
-                          category: snapshot.data[index]);
-                    },
-                    itemCount: snapshot.data.length,
+                ? Column(
+                    children: <Widget>[
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.all(8),
+                        child: new Text(
+                          "Category / Sub Category",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Expanded(
+                        child: new ListView.builder(
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            return new ExpandableListView(
+                                category: snapshot.data[index]);
+                          },
+                          itemCount: snapshot.data.length,
+                        ),
+                      ),
+                    ],
                   )
                 : Center(child: CircularProgressIndicator());
           }),
@@ -91,7 +126,7 @@ class _ExpandableListViewState extends State<ExpandableListView> {
 
   Future<List<SubCategoryModel>> getSubCategories(int catId) async {
     List<SubCategoryModel> subCategoryList =
-        await databaseHelper.getSubCategoryList(catId);
+        await databaseWrapper.getSubCategoryList(catId);
     return subCategoryList;
   }
 

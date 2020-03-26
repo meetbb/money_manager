@@ -38,116 +38,20 @@ class DatabaseHelper {
     return theDb;
   }
 
+  // Create Transaction Table
   void _onCreate(Database db, int version) async {
-    // When creating the db, create the table
-    await db.execute('DROP TABLE IF EXISTS Transactions;');
-    await db.execute('DROP TABLE IF EXISTS Category;');
-    await db.execute('DROP TABLE IF EXISTS SubCategory;');
+    // await db.execute('DROP TABLE IF EXISTS Transactions;');
+    // await db.execute('DROP TABLE IF EXISTS Category;');
+    // await db.execute('DROP TABLE IF EXISTS SubCategory;');
 
     await db.execute(
         "CREATE TABLE IF NOT EXISTS Transactions(trxnId INTEGER PRIMARY KEY AUTOINCREMENT, trxnAmount INTEGER, trxnDate TEXT, categoryId INTEGER, subCategoryId INTEGER , description TEXT, imagePath TEXT, entryDate TEXT, lastModifiedDate TEXT)");
-
-    debugPrint('Transaction table created');
-    // await db.execute(
-    //     "CREATE TABLE IF NOT EXISTS Category(categoryId INTEGER PRIMARY KEY AUTOINCREMENT, categoryName TEXT, categoryType INTEGER , logo TEXT, position INTEGER)");
-    // debugPrint('table created');
-
-    // await db.execute(
-    //     "CREATE TABLE IF NOT EXISTS SubCategory(subCategoryId INTEGER PRIMARY KEY AUTOINCREMENT, subCategoryName TEXT,categoryId INTEGER, subCategoryType INTEGER , logo TEXT, position INTEGER)");
-    // await addCategoriesData();
-
-    // await createCategoryTable(db);
   }
 
   Future<int> saveTransaction(TransactionModel trxnModel) async {
     var dbClient = await db;
     int res = await dbClient.insert("Transactions", trxnModel.toMap());
     return res;
-  }
-
-  Future<List<TransactionModel>> getTrxnList() async {
-    var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM Transactions');
-    List<TransactionModel> trxnList = new List();
-    for (int i = 0; i < list.length; i++) {
-      var trxnModel = new TransactionModel(
-        list[i]["trxnAmount"],
-        list[i]["trxnDate"],
-        list[i]["categoryId"],
-        list[i]["subCategoryId"],
-        list[i]["description"],
-        list[i]["imagePath"],
-        list[i]["lastModifiedDate"],
-      );
-      trxnModel.setTrxnId(list[i]["trxnId"]);
-      trxnList.add(trxnModel);
-    }
-    print(trxnList.length);
-    return trxnList;
-  }
-
-  Future<List<TransactionModel>> getTrxnByCategory(String category) async {
-    var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM Transactions');
-    List<TransactionModel> trxnList = new List();
-    for (int i = 0; i < list.length; i++) {
-      var trxnModel = new TransactionModel(
-        list[i]["trxnAmount"],
-        list[i]["trxnDate"],
-        list[i]["categoryId"],
-        list[i]["subCategoryId"],
-        list[i]["description"],
-        list[i]["imagePath"],
-        list[i]["lastModifiedDate"],
-      );
-      trxnModel.setTrxnId(list[i]["trxnId"]);
-      trxnList.add(trxnModel);
-    }
-    print(trxnList.length);
-    return trxnList;
-  }
-
-  Future<List<TransactionModel>> getDailyTrxnList(String currentdate) async {
-    var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM Transactions WHERE transactiondate = ?', [currentdate]);
-    List<TransactionModel> trxnList = new List();
-    for (int i = 0; i < list.length; i++) {
-      var trxnModel = new TransactionModel(
-        list[i]["trxnAmount"],
-        list[i]["trxnDate"],
-        list[i]["categoryId"],
-        list[i]["subCategoryId"],
-        list[i]["description"],
-        list[i]["imagePath"],
-        list[i]["lastModifiedDate"],
-      );
-      trxnModel.setTrxnId(list[i]["trxnId"]);
-      trxnList.add(trxnModel);
-    }
-    print(trxnList.length);
-    return trxnList;
-  }
-
-  Future<List<TransactionModel>> getMonthlyTrxnList() async {
-    var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery('SELECT * FROM Transactions');
-    List<TransactionModel> trxnList = new List();
-    for (int i = 0; i < list.length; i++) {
-      var trxnModel = new TransactionModel(
-        list[i]["trxnAmount"],
-        list[i]["trxnDate"],
-        list[i]["categoryId"],
-        list[i]["subCategoryId"],
-        list[i]["description"],
-        list[i]["imagePath"],
-        list[i]["lastModifiedDate"],
-      );
-      trxnModel.setTrxnId(list[i]["trxnId"]);
-      trxnList.add(trxnModel);
-    }
-    print(trxnList.length);
-    return trxnList;
   }
 
   Future<int> deleteTrxn(TransactionModel trxnModel) async {
@@ -157,14 +61,7 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<bool> update(TransactionModel trxnModel) async {
-    var dbClient = await db;
-    int res = await dbClient.update("Transactions", trxnModel.toMap(),
-        where: "id = ?", whereArgs: <int>[trxnModel.trxnId]);
-    return res > 0 ? true : false;
-  }
-
-  /// Creating the Table for Budget
+  // Create Budget Table
   Future<bool> createBudgetTable() async {
     var dbClient = await db;
     await dbClient.execute(
@@ -178,7 +75,6 @@ class DatabaseHelper {
     return res;
   }
 
-  ///Get Budget Date from Key
   Future<List<BudgetModel>> getBudgetData() async {
     var dbClient = await db;
     String queryForAll = 'SELECT * FROM $BUDGET_TABLE_NAME';
@@ -202,6 +98,7 @@ class DatabaseHelper {
     return budgetList;
   }
 
+  // Create Category & Sub Category Table
   Future<bool> createCategoryTable(Database db) async {
     // await db.execute('DROP TABLE IF EXISTS Category;');
     // await db.execute('DROP TABLE IF EXISTS SubCategory;');
@@ -297,40 +194,12 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<bool> editCategory(CategoryModel categoryModel) async {
-    var dbClient = await db;
-    int res = await dbClient.update("Category", categoryModel.toMap(),
-        where: "categoryId = ?", whereArgs: <int>[categoryModel.categoryId]);
-    return res > 0 ? true : false;
-  }
-
   Future<int> deleteCategory(CategoryModel categoryModel) async {
     var dbClient = await db;
     int res = await dbClient.rawDelete(
         'DELETE FROM Category WHERE categoryId = ?',
         [categoryModel.categoryId]);
     return res;
-  }
-
-  Future<List<CategoryModel>> getCategoryList(int categoryType) async {
-    var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM Category WHERE categoryType = ?', [categoryType]);
-    List<CategoryModel> categoryList = new List();
-    for (int i = 0; i < list.length; i++) {
-      var categoryModel = new CategoryModel(
-        list[i]["categoryName"],
-        list[i]["categoryType"],
-        list[i]["logo"],
-        list[i]["position"],
-      );
-      categoryModel.setCategoryId(list[i]["categoryId"]);
-      // print(list[i].toString());
-      categoryList.add(categoryModel);
-    }
-    categoryList.sort((a, b) => a.position.compareTo(b.position));
-    // print(categoryList.toString());
-    return categoryList;
   }
 
   //subCategories
@@ -341,41 +210,11 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<bool> editSubCategory(SubCategoryModel subcategoryModel) async {
-    var dbClient = await db;
-    int res = await dbClient.update("SubCategory", subcategoryModel.toMap(),
-        where: "subCategoryId = ?",
-        whereArgs: <int>[subcategoryModel.subCategoryId]);
-    return res > 0 ? true : false;
-  }
-
   Future<int> deleteSubCategory(SubCategoryModel subcategoryModel) async {
     var dbClient = await db;
     int res = await dbClient.rawDelete(
         'DELETE FROM SubCategory WHERE subCategoryId = ?',
         [subcategoryModel.subCategoryId]);
     return res;
-  }
-
-  Future<List<SubCategoryModel>> getSubCategoryList(int categoryId) async {
-    var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM SubCategory  WHERE categoryId = ?', [categoryId]);
-    List<SubCategoryModel> subcategoryList = new List();
-    for (int i = 0; i < list.length; i++) {
-      var categoryModel = new SubCategoryModel(
-        list[i]["subCategoryName"],
-        list[i]["categoryId"],
-        list[i]["subCategoryType"],
-        list[i]["logo"],
-        list[i]["position"],
-      );
-      categoryModel.setSubCategoryId(list[i]["subCategoryId"]);
-      print(list[i].toString());
-      subcategoryList.add(categoryModel);
-    }
-    subcategoryList.sort((a, b) => a.position.compareTo(b.position));
-    // print(categoryList.toString());
-    return subcategoryList;
   }
 }

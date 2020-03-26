@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneymanager/database/database.dart';
+import 'package:moneymanager/database/database_wrapper.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/views/settings.dart';
 import 'package:moneymanager/views/stats.dart';
@@ -42,6 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void setDatabase() async {
     databaseHelper = new DatabaseHelper();
+    databaseWrapper = new DatabaseWrapper();
     await databaseHelper.createCategoryTable(await databaseHelper.db);
   }
 

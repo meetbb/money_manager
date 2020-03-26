@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/database/model/category_model.dart';
 import 'package:moneymanager/database/model/subcategory_model.dart';
 import 'package:moneymanager/database/model/transaction_model.dart';
 import 'package:moneymanager/utilities/constants.dart';
 import 'package:moneymanager/utilities/utils.dart';
 import 'package:moneymanager/views/category_selection.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class AddExpensesPage extends StatefulWidget {
+  final bool isEdit;
+  TransactionModel trxn;
+  AddExpensesPage({Key key, this.isEdit, this.trxn});
   @override
   _AddExpensesPageState createState() => _AddExpensesPageState();
 }
@@ -31,6 +34,22 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
   void initState() {
     super.initState();
     // amountController.text = '0';
+    if (widget.isEdit) {
+      getTrxnDetails();
+    }
+  }
+
+  getTrxnDetails() async {
+    selectedCategory = await databaseWrapper.getCategory(widget.trxn.categoryId);
+    selectedSubCategory =
+        await databaseWrapper.getSubCategory(widget.trxn.subCategoryId);
+    amountController.text = widget.trxn.trxnAmount.toString();
+    descriptionController.text = widget.trxn.description.toString();
+    trxnType = selectedCategory.categoryType;
+    selectedDate =
+        DateFormat('yyyy-MM-dd HH:mm:ss').parse(widget.trxn.getTrxnDate);
+
+    setState(() {});
   }
 
   @override
@@ -102,8 +121,12 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                       onValueChanged: (value) {
                         setState(() {
                           trxnType = value;
+                          // if (widget.isEdit == true) {
+                          //   if (selectedCategory.categoryType == trxnType) {}
+                          // } else {
                           selectedCategory = null;
                           selectedSubCategory = null;
+                          // }
                         });
                       },
                     ),
@@ -190,21 +213,24 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                   GestureDetector(
                     onTap: () async {
                       hideKeyboard();
-                      List<dynamic> selected = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CategorySelection(
-                                  categoryType: trxnType,
-                                )),
-                      );
-                      if (selected != null) {
-                        selectedCategory = selected[0];
-                        if (selected.length > 1) {
-                          selectedSubCategory = selected[1];
-                        } else {
-                          selectedSubCategory = null;
-                        }
-                      }
+
+                      showCategories();
+
+                      // List<dynamic> selected = await Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //       builder: (context) => CategorySelection(
+                      //             categoryType: trxnType,
+                      //           )),
+                      // );
+                      // if (selected != null) {
+                      //   selectedCategory = selected[0];
+                      //   if (selected.length > 1) {
+                      //     selectedSubCategory = selected[1];
+                      //   } else {
+                      //     selectedSubCategory = null;
+                      //   }
+                      // }
                     },
                     child: Container(
                       color: Colors.transparent,
@@ -248,9 +274,10 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                                                   : 'Income : ' +
                                                       selectedCategory
                                                           .categoryName
-                                          : trxnType == 0
-                                              ? 'Uncategorized'
-                                              : 'Income',
+                                          : 'Category',
+                                      //trxnType == 0
+                                      //    ? 'Uncategorized'
+                                      //    : 'Income',
                                       style: TextStyle(
                                           color: selectedCategory != null
                                               ? Colors.black
@@ -285,6 +312,8 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                   GestureDetector(
                     onTap: () async {
                       hideKeyboard();
+                      showCalendar();
+                      return;
                       DateTime date = await showDatePicker(
                         context: context,
                         initialDate: DateTime.now(),
@@ -760,73 +789,87 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
                   SizedBox(
                     height: 24,
                   ),
-                  FlatButton(
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(30.0)),
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    disabledColor: Colors.blue.withOpacity(0.5),
-                    disabledTextColor: Colors.white,
-                    padding: EdgeInsets.all(16.0),
-                    splashColor: Colors.blueAccent,
-                    onPressed: () async {
-                      hideKeyboard();
 
-                      if (amountController.text.length == 0) {
-                        showAlert(context, "An amount is required.");
-                        return;
-                      }
+                  Container(
+                    width: MediaQuery.of(context).size.width - 60,
+                    child: FlatButton(
+                      shape: new RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(30.0)),
+                      color: Colors.blueAccent,
+                      textColor: Colors.white,
+                      disabledColor: Colors.blue.withOpacity(0.5),
+                      disabledTextColor: Colors.white,
+                      padding: EdgeInsets.all(16.0),
+                      splashColor: Colors.blueAccent,
+                      onPressed: () async {
+                        hideKeyboard();
 
-                      if (!RegExp(
-                              r"^\-?\(?\$?\s*\-?\s*\(?(((\d{1,3}((\,\d{3})*|\d*))?(\.\d{1,4})?)|((\d{1,3}((\,\d{3})*|\d*))(\.\d{0,4})?))\)?$")
-                          .hasMatch(amountController.text)) {
-                        showAlert(context, "Please enter a valid amount.");
-                        return null;
-                      }
+                        if (amountController.text.length == 0) {
+                          showAlert(context, "An amount is required.");
+                          return;
+                        }
 
-                      if (int.parse(amountController.text) <= 0) {
-                        showAlert(context, "Please enter a valid amount.");
-                        return null;
-                      }
-                      if (selectedCategory == null) {
-                        showAlert(context, "Please select Category.");
-                        return;
-                      }
+                        if (!RegExp(
+                                r"^\-?\(?\$?\s*\-?\s*\(?(((\d{1,3}((\,\d{3})*|\d*))?(\.\d{1,4})?)|((\d{1,3}((\,\d{3})*|\d*))(\.\d{0,4})?))\)?$")
+                            .hasMatch(amountController.text)) {
+                          showAlert(context, "Please enter a valid amount.");
+                          return null;
+                        }
 
-                      if (selectedDate == null) {
-                        showAlert(context, "Please select Date.");
-                        return;
-                      }
+                        if (int.parse(amountController.text) <= 0) {
+                          showAlert(context, "Please enter a valid amount.");
+                          return null;
+                        }
+                        if (selectedCategory == null) {
+                          showAlert(context, "Please select Category.");
+                          return;
+                        }
 
-                      if (descriptionController.text.length == 0) {
-                        showAlert(context, "Please enter a Note.");
-                        return;
-                      }
+                        if (selectedDate == null) {
+                          showAlert(context, "Please select Date.");
+                          return;
+                        }
 
-                      TransactionModel trxnModel = new TransactionModel(
-                          int.parse(amountController.text),
-                          DateFormat('dd-MM-yyyy').format(selectedDate),
-                          selectedCategory != null
-                              ? selectedCategory.categoryId
-                              : -1,
-                          selectedSubCategory != null
-                              ? selectedSubCategory.subCategoryId
-                              : -1,
-                          descriptionController.text,
-                          '',
-                          DateFormat('dd-MM-yyyy').format(selectedDate));
+                        if (descriptionController.text.length == 0) {
+                          showAlert(context, "Please enter a Note.");
+                          return;
+                        }
 
-                      int value =
-                          await databaseHelper.saveTransaction(trxnModel);
-                      if (value != 0) {
-                        Navigator.pop(context, true);
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 70),
-                      child: Text(
-                        "Save",
-                        style: TextStyle(fontSize: 20.0),
+                        TransactionModel trxnModel = new TransactionModel(
+                            int.parse(amountController.text),
+                            // DateFormat('dd-MM-yyyy').format(selectedDate),
+                            DateFormat('yyyy-MM-dd HH:mm:ss')
+                                .format(selectedDate),
+                            selectedCategory != null
+                                ? selectedCategory.categoryId
+                                : -1,
+                            selectedSubCategory != null
+                                ? selectedSubCategory.subCategoryId
+                                : -1,
+                            descriptionController.text,
+                            '',
+                            DateFormat('yyyy-MM-dd HH:mm:ss')
+                                .format(selectedDate));
+
+                        if (widget.isEdit) {
+                          trxnModel.setTrxnId(widget.trxn.trxnId);
+                          await databaseWrapper.updateTransaction(trxnModel);
+                          Navigator.pop(context, true);
+                        } else {
+                          int value =
+                              await databaseHelper.saveTransaction(trxnModel);
+                          if (value != 0) {
+                            Navigator.pop(context, true);
+                          }
+                        }
+                      },
+                      child: Container(
+                        // padding: EdgeInsets.symmetric(horizontal: 70),
+                        child: Text(
+                          "SAVE",
+                          style: TextStyle(
+                              fontSize: 16.0, fontWeight: FontWeight.w500),
+                        ),
                       ),
                     ),
                   ),
@@ -840,5 +883,74 @@ class _AddExpensesPageState extends State<AddExpensesPage> {
         ),
       ),
     );
+  }
+
+  showCategories() async {
+    List<dynamic> selected = await showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        context: context,
+        builder: (BuildContext bc) {
+          return CategorySelection(
+            categoryType: trxnType,
+          );
+        });
+    if (selected != null) {
+      selectedCategory = selected[0];
+      if (selected.length > 1) {
+        selectedSubCategory = selected[1];
+      } else {
+        selectedSubCategory = null;
+      }
+    }
+  }
+
+  showCalendar() async {
+    CalendarController _calendarController = new CalendarController();
+
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        context: context,
+        builder: (BuildContext bc) => Container(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              children: <Widget>[
+                TableCalendar(
+                  availableCalendarFormats: const {
+                    CalendarFormat.month: '',
+                  },
+                  availableGestures: AvailableGestures.none,
+                  initialSelectedDay: selectedDate,
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  headerStyle: HeaderStyle(
+                    centerHeaderTitle: true,
+                    formatButtonTextStyle: TextStyle()
+                        .copyWith(color: Colors.white, fontSize: 15.0),
+                    formatButtonDecoration: BoxDecoration(
+                      color: Colors.deepOrange[400],
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                  ),
+                  calendarController: _calendarController,
+                  locale: 'en_US',
+                  calendarStyle: CalendarStyle(
+                    selectedColor: Colors.blueAccent[400],
+                    todayColor: Colors.blue[200],
+                    markersColor: Colors.white,
+                    weekdayStyle: TextStyle(color: Colors.black87),
+                    outsideStyle: TextStyle(color: Colors.grey),
+                    outsideDaysVisible: true,
+                  ),
+                  onDaySelected: (date, events) {
+                    Navigator.pop(context);
+                    selectedDate = date;
+                    setState(() {});
+                  },
+                ),
+              ],
+            )));
   }
 }

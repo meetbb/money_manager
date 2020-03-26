@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:moneymanager/database/database.dart';
+import 'package:moneymanager/database/database_wrapper.dart';
 
 String appName = "Money manager";
 
+DatabaseHelper databaseHelper;
+DatabaseWrapper databaseWrapper;
 
- DatabaseHelper databaseHelper;
-
- 
 class UniqueColorGenerator {
   static Random random = new Random();
   static Color getColor() {

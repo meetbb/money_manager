@@ -24,12 +24,28 @@ class TransactionHistoryState extends State<TransactionHistory>
   final trxnListBloc = TrxnListBloc();
 
   Widget getListCard(TransactionModel model) {
-    return Card(
-      margin: new EdgeInsets.only(top: 10, left: 10, right: 10.0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-      child: Container(
-        decoration: BoxDecoration(color: Colors.white70),
-        child: getListTile(model),
+    return GestureDetector(
+      onTap: () async {
+        bool isAddEdit = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AddExpensesPage(
+                    isEdit: true,
+                    trxn: model,
+                  )),
+        );
+        if (isAddEdit != null) {
+          trxnListBloc.updateTrxnList(_tabController.index);
+        }
+      },
+      child: Card(
+        margin: new EdgeInsets.only(top: 10, left: 10, right: 10.0),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        child: Container(
+          decoration: BoxDecoration(color: Colors.white70),
+          child: getListTile(model),
+        ),
       ),
     );
   }
@@ -165,7 +181,15 @@ class TransactionHistoryState extends State<TransactionHistory>
               ),
             );
           } else {
-            return Container();
+            return Column(
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(top: 20),
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator()),
+              ],
+            );
           }
         });
   }
@@ -198,9 +222,9 @@ class TransactionHistoryState extends State<TransactionHistory>
   void initState() {
     super.initState();
     _tabController = new TabController(vsync: this, length: tabs.length);
-    trxnListBloc.updateTrxnList();
+    trxnListBloc.updateTrxnList(_tabController.index);
     _tabController.addListener(() {
-      trxnListBloc.updateTrxnList();
+      trxnListBloc.updateTrxnList(_tabController.index);
     });
   }
 
@@ -259,59 +283,103 @@ class TransactionHistoryState extends State<TransactionHistory>
           onPressed: () async {
             bool isAddEdit = await Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => AddExpensesPage()),
+              MaterialPageRoute(
+                  builder: (context) => AddExpensesPage(isEdit: false)),
             );
             if (isAddEdit != null) {
-              trxnListBloc.updateTrxnList();
+              trxnListBloc.updateTrxnList(_tabController.index);
             }
           },
         ));
-  }
-
-  Future addRecord() async {
-    var categoryList = ['Investment', 'Food', 'income', 'rent', 'shopping'];
-    var amountList = ['₹ 200', '₹ 250', '₹ 2000', '₹ 1000', '₹ 2500'];
-    var titleList = [
-      'New MF Purchase',
-      'Dinner',
-      'Salary',
-      'Home rent',
-      'Clothes Shopping'
-    ];
-    var dateList = [
-      '23-03-2020',
-      '24-03-2020',
-      '21-03-2020',
-      '12-03-2020',
-      '02-03-2020'
-    ];
-    // var typeList = [false, true];
-    // var db = new DatabaseHelper();
-    // final _random = new Random();
-    // var categoryElement = categoryList[_random.nextInt(categoryList.length)];
-    // var amountElement = amountList[_random.nextInt(amountList.length)];
-    // var titleElement = titleList[_random.nextInt(titleList.length)];
-    // var dateElement = dateList[_random.nextInt(dateList.length)];
-    // var typeElement = typeList[_random.nextInt(typeList.length)];
-    // var transaction = new TransactionModel(
-    //     titleElement, amountElement, dateElement, categoryElement, typeElement);
-    // int insertValue = await db.saveTransaction(transaction);
-    // if (insertValue > 0) {
-    //   setState(() {
-    //     trxnListBloc.updateTrxnList();
-    //   });
-    // }
-    // debugPrint('Insert Value is: $insertValue');
   }
 }
 
 class TrxnListBloc {
   StreamController<List<TransactionModel>> controller =
       new StreamController.broadcast();
-  // var db = new DatabaseHelper();
 
-  void updateTrxnList() async {
-    List<TransactionModel> trxnList = await databaseHelper.getTrxnList();
+  int getWeekOfYear(DateTime date) {
+    final weekYearStartDate = getWeekYearStartDateForDate(date);
+    final dayDiff = date.difference(weekYearStartDate).inDays;
+    return ((dayDiff + 1) / 7).ceil();
+  }
+
+  DateTime getWeekYearStartDateForDate(DateTime date) {
+    int weekYear = getWeekYear(date);
+    return getWeekYearStartDate(weekYear);
+  }
+
+  int getWeekYear(DateTime date) {
+    assert(date.isUtc);
+
+    final weekYearStartDate = getWeekYearStartDate(date.year);
+
+    // in previous week year?
+    if (weekYearStartDate.isAfter(date)) {
+      return date.year - 1;
+    }
+
+    // in next week year?
+    final nextWeekYearStartDate = getWeekYearStartDate(date.year + 1);
+    if (date.isAfter(nextWeekYearStartDate)) {
+      return date.year + 1;
+    }
+
+    return date.year;
+  }
+
+  isBeforeOrEqual(nextWeekYearStartDate, date) {}
+  // if(date.isAfter(nextWeekYearStartDate)||Utils.isSameDay(date, nextWeekYearStartDate)){ return date.year + 1; } and if(dayOfWeek <= DateTime.thursday) { return firstDayOfYear.subtract(Duration(days: dayOfWeek-1)); } else { return firstDayOfYear.add(Duration(days:8 - dayOfWeek )) }
+
+//  return firstDayOfYear.subtract(Duration(days: dayOfWeek-1)); } else { return firstDayOfYear.add(Duration(days:8 - dayOfWeek )) }
+
+  DateTime getWeekYearStartDate(int year) {
+    final firstDayOfYear = DateTime.utc(year, 1, 1);
+    final dayOfWeek = firstDayOfYear.weekday;
+    if (dayOfWeek <= DateTime.thursday) {
+      return firstDayOfYear.subtract(Duration(days: dayOfWeek - 1));
+    } else {
+      firstDayOfYear.add(Duration(days: 8 - dayOfWeek));
+    }
+  }
+
+  void updateTrxnList(int index) async {
+    debugPrint('tabbar controller index : ' + index.toString());
+    DateTime date = new DateTime.now();
+    String stDate = '';
+    String enDate = '';
+
+    if (index == 0) {
+      stDate = DateFormat('yyyy-MM-dd 00:00:00').format(DateTime.now());
+      enDate = DateFormat('yyyy-MM-dd 23:59:59').format(DateTime.now());
+      //weekly
+    } else if (index == 2) {
+      DateTime monday = DateTime.utc(date.year, date.month, date.day);
+      monday = monday.subtract(Duration(days: monday.weekday - 1));
+
+      stDate = DateFormat('yyyy-MM-dd 00:00:00').format(monday);
+      enDate = DateFormat('yyyy-MM-dd 23:59:59')
+          .format(monday.add(new Duration(days: 6)));
+    } else if (index == 3) {
+      DateTime monthStartDate = DateTime.utc(date.year, date.month - 1, 1);
+      DateTime monthEndDate = DateTime.utc(date.year, date.month + 1, 1)
+          .subtract(new Duration(days: 1));
+      stDate = DateFormat('yyyy-MM-dd 00:00:00').format(monthStartDate);
+      enDate = DateFormat('yyyy-MM-dd 23:59:59').format(monthEndDate);
+    } else if (index == 4) {
+      DateTime yearStartDate = DateTime.utc(date.year, 1, 1);
+      DateTime yearEndDate =
+          DateTime.utc(date.year + 1, 1, 1).subtract(new Duration(days: 1));
+
+      stDate = DateFormat('yyyy-MM-dd 00:00:00').format(yearStartDate);
+      enDate = DateFormat('yyyy-MM-dd 23:59:59').format(yearEndDate);
+
+      debugPrint('St Date :' + stDate);
+      debugPrint('end Date :' + enDate);
+    }
+
+    List<TransactionModel> trxnList =
+        await databaseWrapper.getTrxnListByDate(stDate, enDate);
     controller.sink.add(trxnList);
   }
 
