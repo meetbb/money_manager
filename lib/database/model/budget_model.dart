@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 class BudgetModel {
   int budgetId;
   String budgetName;
@@ -9,14 +11,14 @@ class BudgetModel {
   String isNotificationsAllowed;
 
   BudgetModel(
-      this.budgetId,
       this.budgetName,
       this.budgetAmount,
       this.budgetCategory,
       this.budgetRecurrence,
       this.startDate,
       this.endDate,
-      this.isNotificationsAllowed);
+      this.isNotificationsAllowed,
+      {this.budgetId});
 
   BudgetModel.map(dynamic obj) {
     this.budgetId = obj["BudgetId"];
@@ -40,7 +42,7 @@ class BudgetModel {
 
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
-    map["BudgetId"] = budgetId;
+    // map["BudgetId"] = budgetId;
     map["BudgetName"] = budgetName;
     map["BudgetAmount"] = budgetAmount;
     map["BudgetCategory"] = budgetCategory;
@@ -50,4 +52,32 @@ class BudgetModel {
     map["BudgetNotifications"] = isNotificationsAllowed;
     return map;
   }
+}
+
+/// Interactor
+abstract class BudgetInteractor {
+  Stream<BudgetMessage> saveBudget(
+    BudgetModel budgetModel,
+    Sink<bool> isLoadingSink,
+  );
+}
+
+/// Login message
+@immutable
+abstract class BudgetMessage {}
+
+class BudgetSuccessMessage implements BudgetMessage {
+  final String token;
+
+  const BudgetSuccessMessage(this.token);
+}
+
+class BudgetErrorMessage implements BudgetMessage {
+  final Object error;
+
+  const BudgetErrorMessage(this.error);
+}
+
+class InvalidInformationMessage implements BudgetMessage {
+  const InvalidInformationMessage();
 }

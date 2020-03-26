@@ -23,6 +23,41 @@ class ShoppingWidget extends StatelessWidget {
   }
 }
 
+class CategoryWidget extends StatelessWidget {
+  final Color widgetColor;
+  final String iconName;
+  final double size;
+  final double iconSize;
+  final double padding;
+
+  CategoryWidget(
+      {@required this.iconName,
+      this.widgetColor = Colors.red,
+      this.size = 40,
+      this.iconSize = 25,
+      this.padding = 5.0});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: new BoxDecoration(
+        shape: BoxShape.circle,
+        color: widgetColor,
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(padding),
+        child: SvgPicture.asset(
+          iconName,
+          width: iconSize,
+          height: iconSize,
+        ),
+      ),
+    );
+  }
+}
+
 class SalaryWidget extends StatelessWidget {
   final double size;
   final double iconSize;

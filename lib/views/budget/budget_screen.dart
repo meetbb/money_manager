@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:moneymanager/database/database.dart';
+import 'package:moneymanager/database/model/budget_model.dart';
+import 'package:moneymanager/utlis/asset_utils.dart';
 import 'package:moneymanager/views/budget/add_budget_screen.dart';
 import 'package:moneymanager/views/uiwidgets/category_icons.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -11,14 +16,24 @@ class BudgetScreen extends StatefulWidget {
 }
 
 class BudgetScreenState extends State<BudgetScreen> {
+  final budgetListBloc = BudgetListBloc();
+
   @override
   void initState() {
     super.initState();
+    getBudget();
   }
 
   @override
   void dispose() {
     super.dispose();
+    budgetListBloc.dispose();
+  }
+
+  void getBudget() async {
+    var dbHelper = new DatabaseHelper();
+    List<BudgetModel> modelList = await dbHelper.getBudgetData();
+    budgetListBloc.updateModelList(modelList);
   }
 
   @override
@@ -59,18 +74,18 @@ class BudgetScreenState extends State<BudgetScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
                               new Icon(
-                                Icons.home,
+                                Icons.monetization_on,
                                 size: 40.0,
                                 color: Colors.white,
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.symmetric(vertical: 10.0),
+                                    const EdgeInsets.symmetric(vertical: 8.0),
                                 child: new Text(
                                   "₹ 250",
                                   style: TextStyle(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w400,
                                       fontSize: 32),
                                 ),
                               ),
@@ -78,7 +93,7 @@ class BudgetScreenState extends State<BudgetScreen> {
                                 "Left to spend",
                                 style: TextStyle(
                                     color: Colors.white70,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.w300,
                                     fontSize: 17),
                               )
                             ],
@@ -147,7 +162,10 @@ class BudgetScreenState extends State<BudgetScreen> {
                                                 SizedBox(
                                                   height: 8.0,
                                                 ),
-                                                ValueText(text: '₹ 25,000')
+                                                ValueText(
+                                                  text: '₹ 25,000',
+                                                  fontWeight: FontWeight.w500,
+                                                )
                                               ],
                                             ),
                                             Column(
@@ -157,7 +175,10 @@ class BudgetScreenState extends State<BudgetScreen> {
                                                 SizedBox(
                                                   height: 8.0,
                                                 ),
-                                                ValueText(text: '₹ 1000')
+                                                ValueText(
+                                                  text: '₹ 1000',
+                                                  fontWeight: FontWeight.w500,
+                                                )
                                               ],
                                             ),
                                             Column(
@@ -167,7 +188,10 @@ class BudgetScreenState extends State<BudgetScreen> {
                                                 SizedBox(
                                                   height: 8.0,
                                                 ),
-                                                ValueText(text: '₹ 250')
+                                                ValueText(
+                                                  text: '₹ 250',
+                                                  fontWeight: FontWeight.w500,
+                                                )
                                               ],
                                             )
                                           ],
@@ -182,32 +206,77 @@ class BudgetScreenState extends State<BudgetScreen> {
                                   child:
                                       HeaderText(text: 'BUDGET DISTRIBUTION'),
                                 ),
-                                GridView.builder(
-                                    itemCount: 9,
-                                    shrinkWrap: true,
-                                    physics: BouncingScrollPhysics(),
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 3),
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      return new Card(
-                                          child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          (index % 2 == 0)
-                                              ? RentWidget()
-                                              : ShoppingWidget(),
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 8.0),
-                                            child: ValueText(text: 'Rs. 1000'),
-                                          )
-                                        ],
-                                      ));
+                                StreamBuilder<List<BudgetModel>>(
+                                    stream: budgetListBloc.budgetListStream,
+                                    builder: (context, snapshot) {
+                                      List<BudgetModel> budgetList = new List();
+                                      List<String> iconList = new List();
+                                      if (snapshot.hasData) {
+                                        budgetList = snapshot.data;
+                                        for (var budgetModel in budgetList) {
+                                          switch (
+                                              budgetModel.getBudgetCategory) {
+                                            case "HomeExpense":
+                                              iconList
+                                                  .add(AssetUtils.HOME_WIDGET);
+                                              break;
+                                            case "Food":
+                                              iconList
+                                                  .add(AssetUtils.FOOD_WIDGET);
+                                              break;
+                                            case "Rent":
+                                              iconList
+                                                  .add(AssetUtils.RENT_WIDGET);
+                                              break;
+                                            case "Salary":
+                                              iconList.add(
+                                                  AssetUtils.SALARY_WIDGET);
+                                              break;
+                                            case "Shopping":
+                                              iconList.add(
+                                                  AssetUtils.SHOPPING_WIDGET);
+                                              break;
+                                            default:
+                                              iconList
+                                                  .add(AssetUtils.HOME_WIDGET);
+                                          }
+                                        }
+                                      }
+                                      return GridView.builder(
+                                          itemCount: budgetList.length,
+                                          shrinkWrap: true,
+                                          physics: BouncingScrollPhysics(),
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                                  crossAxisCount: 3),
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return new Card(
+                                                child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: <Widget>[
+                                                CategoryWidget(
+                                                  iconName: iconList[index],
+                                                  padding: 8.0,
+                                                  size: 50,
+                                                  iconSize: 20,
+                                                ),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 8.0),
+                                                  child: ValueText(
+                                                    text:
+                                                        '₹ ${budgetList[index].getBudgetAmount}',
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 15,
+                                                  ),
+                                                )
+                                              ],
+                                            ));
+                                          });
                                     })
                               ],
                             ),
@@ -224,6 +293,21 @@ class BudgetScreenState extends State<BudgetScreen> {
       ),
     );
   }
+}
+
+class BudgetListBloc {
+  StreamController<List<BudgetModel>> controller =
+      new StreamController<List<BudgetModel>>.broadcast();
+
+  void updateModelList(List<BudgetModel> counter) {
+    controller.sink.add(counter);
+  }
+
+  void dispose() {
+    controller.close();
+  }
+
+  Stream get budgetListStream => controller.stream;
 }
 
 class DescText extends StatelessWidget {
@@ -243,15 +327,20 @@ class DescText extends StatelessWidget {
 
 class ValueText extends StatelessWidget {
   final String text;
+  final FontWeight fontWeight;
+  final double fontSize;
 
-  ValueText({@required this.text});
+  ValueText(
+      {@required this.text,
+      this.fontWeight = FontWeight.w600,
+      this.fontSize = 17});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
       style: TextStyle(
-          color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 19),
+          color: Colors.black87, fontWeight: fontWeight, fontSize: fontSize),
     );
   }
 }

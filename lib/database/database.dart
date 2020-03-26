@@ -179,22 +179,27 @@ class DatabaseHelper {
   }
 
   ///Get Budget Date from Key
-  Future<BudgetModel> getBudgetData(int budgetId) async {
+  Future<List<BudgetModel>> getBudgetData() async {
     var dbClient = await db;
-    List<Map> list = await dbClient.rawQuery(
-        'SELECT * FROM $BUDGET_TABLE_NAME WHERE $BUDGET_ID_KEY = ?',
-        [budgetId]);
-    var budgetModel = new BudgetModel(
-      list[0][BUDGET_ID_KEY],
-      list[0][BUDGET_NAME_KEY],
-      list[0][BUDGET_AMOUNT_KEY],
-      list[0][BUDGET_CATEGORY_KEY],
-      list[0][BUDGET_RECURRENCE_KEY],
-      list[0][BUDGET_START_DATE_KEY],
-      list[0][BUDGET_END_DATE_KEY],
-      list[0][BUDGET_NOTIFY_KEY],
-    );
-    return budgetModel;
+    String queryForAll = 'SELECT * FROM $BUDGET_TABLE_NAME';
+    List<Map> list = await dbClient.rawQuery(queryForAll);
+    List<BudgetModel> budgetList = new List();
+    // List<Map> list = await dbClient.rawQuery(
+    //     'SELECT * FROM $BUDGET_TABLE_NAME WHERE $BUDGET_ID_KEY = ?',
+    //     [budgetId]);
+    for (int i = 0; i < list.length; i++) {
+      var budgetModel = new BudgetModel(
+          list[i][BUDGET_NAME_KEY],
+          list[i][BUDGET_AMOUNT_KEY],
+          list[i][BUDGET_CATEGORY_KEY],
+          list[i][BUDGET_RECURRENCE_KEY],
+          list[i][BUDGET_START_DATE_KEY],
+          list[i][BUDGET_END_DATE_KEY],
+          list[i][BUDGET_NOTIFY_KEY],
+          budgetId: list[i][BUDGET_ID_KEY]);
+      budgetList.add(budgetModel);
+    }
+    return budgetList;
   }
 
   Future<bool> createCategoryTable(Database db) async {

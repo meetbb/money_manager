@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moneymanager/database/database.dart';
 import 'package:moneymanager/utilities/constants.dart';
-import 'package:moneymanager/views/add_expenses.dart';
-import 'package:moneymanager/views/category_list.dart';
 import 'package:moneymanager/views/settings.dart';
 import 'package:moneymanager/views/stats.dart';
 import 'package:moneymanager/views/transaction_history.dart';
