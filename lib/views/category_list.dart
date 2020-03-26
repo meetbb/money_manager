@@ -40,14 +40,14 @@ class _CategoryListPageState extends State<CategoryListPage> {
 
   getCategories() async {
     // await DatabaseHelper().createCategoryTable(await DatabaseHelper().db);
-    categoryList = await databaseHelper.getCategoryList(widget.categoryType);
+    categoryList = await databaseWrapper.getCategoryList(widget.categoryType);
 
     setState(() {});
   }
 
   Future<String> getSubCategoryCount(index) async {
-    List<SubCategoryModel> subcategoryList =
-        await databaseHelper.getSubCategoryList(categoryList[index].categoryId);
+    List<SubCategoryModel> subcategoryList = await databaseWrapper
+        .getSubCategoryList(categoryList[index].categoryId);
     if (subcategoryList.length > 0) {
       return subcategoryList.length.toString();
     } else {
@@ -59,7 +59,9 @@ class _CategoryListPageState extends State<CategoryListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text( widget.categoryType ==0 ? 'Expenses Category': 'Income Category'),
+          title: Text(widget.categoryType == 0
+              ? 'Expenses Category'
+              : 'Income Category'),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -77,7 +79,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                             )),
                   );
                   if (isAddOrEdit != null) {
-                    categoryList = await databaseHelper
+                    categoryList = await databaseWrapper
                         .getCategoryList(widget.categoryType);
 
                     setState(() {});
@@ -128,7 +130,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                               () async {
                                             databaseHelper.deleteCategory(
                                                 categoryList[index]);
-                                            categoryList = await databaseHelper
+                                            categoryList = await databaseWrapper
                                                 .getCategoryList(
                                                     widget.categoryType);
                                             // categoryList.removeAt(index);
@@ -166,7 +168,8 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     AddEditCategoryPage(
-                                                      categoryType: widget.categoryType,
+                                                      categoryType:
+                                                          widget.categoryType,
                                                       isEdit: true,
                                                       isCategory: true,
                                                       category:
@@ -174,7 +177,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                                                     )),
                                           );
                                           if (isAddOrEdit != null) {
-                                            categoryList = await databaseHelper
+                                            categoryList = await databaseWrapper
                                                 .getCategoryList(
                                                     widget.categoryType);
                                             setState(() {});
