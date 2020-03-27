@@ -143,87 +143,122 @@ class AddBudgetScreenState extends State<AddBudgetScreen> {
               SizedBox(
                 height: 40,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: StreamBuilder<Set<ValidationError>>(
-                    stream: _budgetBloc.budgetNameError$,
-                    builder: (context, snapshot) {
-                      return TextFormField(
-                        controller: budgetNameController,
-                        onChanged: _budgetBloc.budgetNameChanged,
-                        decoration: InputDecoration(
-                          hintText: 'Budget name',
-                          errorText: _getErrorMessage(snapshot.data),
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15.0, vertical: 10.0),
-                            child: SvgPicture.asset(
-                              AssetUtils.BUDGET_WIDGET,
-                              width: 12,
-                              height: 12,
-                              color: Colors.blue,
+              Divider(
+                height: 1,
+                color: Colors.grey,
+              ),
+              StreamBuilder<Set<ValidationError>>(
+                stream: _budgetBloc.budgetNameError$,
+                builder: (context, snapshot) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      PlaceHolderWidget(placeHolder: AssetUtils.BUDGET_WIDGET),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: budgetNameController,
+                          onChanged: _budgetBloc.budgetNameChanged,
+                          style: new TextStyle(
+                              color: Colors.black,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700),
+                          decoration: InputDecoration(
+                            hintText: 'Budget name',
+                            errorText: _getErrorMessage(snapshot.data),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 16.0,
                             ),
-                          ),
-                          contentPadding: new EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 4.0),
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15.0),
+                            hintStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey),
+                            prefixStyle: new TextStyle(
+                                color: Colors.blue,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
+                            hasFloatingPlaceholder: true,
+                            filled: true,
+                            fillColor: Colors.transparent,
                           ),
                         ),
-                        validator: (value) {
-                          if (value.length == 0) {
-                            return 'Budget name is empty!';
-                          } else {
-                            return null;
-                          }
-                        },
-                      );
-                    }),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               SizedBox(
                 height: 15,
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: StreamBuilder<Set<ValidationError>>(
-                    stream: _budgetBloc.budgetAmountError$,
-                    builder: (context, snapshot) {
-                      return TextFormField(
-                        controller: amountController,
-                        onChanged: _budgetBloc.budgetAmountChanged,
-                        decoration: InputDecoration(
-                          hintText: 'Amount',
-                          errorText: _getErrorMessage(snapshot.data),
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 15.0, vertical: 10.0),
-                            child: SvgPicture.asset(
-                              AssetUtils.RUPEE_WIDGET,
-                              width: 12,
-                              height: 12,
-                              color: Colors.blue,
+              Divider(
+                height: 1,
+                color: Colors.grey,
+              ),
+              StreamBuilder<Set<ValidationError>>(
+                stream: _budgetBloc.budgetAmountError$,
+                builder: (context, snapshot) {                  
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      PlaceHolderWidget(placeHolder: AssetUtils.RUPEE_WIDGET),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          controller: amountController,
+                          onChanged: _budgetBloc.budgetAmountChanged,
+                          style: new TextStyle(
+                              color: Colors.black,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w700),
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            errorText: _getErrorMessage(snapshot.data),
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 16.0,
                             ),
+                            hintText: "Amount",
+                            hintStyle: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey),
+                            // prefix: Text("₹ "),
+                            prefixStyle: new TextStyle(
+                                color: Colors.blue,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
+                            hasFloatingPlaceholder: true,
+                            filled: true,
+                            fillColor: Colors.transparent,
                           ),
-                          contentPadding: new EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 4.0),
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
                         ),
-                        validator: (value) {
-                          if (value.length == 0) {
-                            return 'Amount is empty!';
-                          } else {
-                            return null;
-                          }
-                        },
-                      );
-                    }),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               SizedBox(
-                height: 25,
+                height: 15,
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               InkWell(
                 onTap: () {
@@ -233,52 +268,45 @@ class AddBudgetScreenState extends State<AddBudgetScreen> {
                     selectCategoryBloc.updateCategory(selectedCategory);
                   }, categoryList, isRecurrenceDialog: false);
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25.0, right: 10.0),
-                      child: SvgPicture.asset(
-                        AssetUtils.BUDGET_WIDGET,
-                        width: 20,
-                        height: 20,
-                        color: Colors.blue,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      PlaceHolderWidget(placeHolder: AssetUtils.RUPEE_WIDGET),
+                      SizedBox(
+                        width: 10,
                       ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Budget for',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87),
+                      Expanded(
+                        child: StreamBuilder<String>(
+                            stream: selectCategoryBloc.selectedCategoryStream,
+                            builder: (context, snapshot) {
+                              return Text(
+                                snapshot.data ?? 'Budget for',
+                                style: TextStyle(
+                                    fontSize: 26,
+                                    fontWeight: FontWeight.w500,
+                                    color: (snapshot.hasData)
+                                        ? Colors.black87
+                                        : Colors.grey),
+                              );
+                            }),
                       ),
-                    ),
-                    StreamBuilder<String>(
-                        stream: selectCategoryBloc.selectedCategoryStream,
-                        builder: (context, snapshot) {
-                          String category = '';
-                          if (snapshot.hasData) {
-                            category = '${snapshot.data} >';
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Row(
-                              children: <Widget>[
-                                HeaderText(
-                                  text: category,
-                                  fontColor: Colors.blue,
-                                ),
-                              ],
-                            ),
-                          );
-                        })
-                  ],
+                    ],
+                  ),
                 ),
               ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
+              ),
               SizedBox(
-                height: 25,
+                height: 15,
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               InkWell(
                 onTap: () {
@@ -289,48 +317,43 @@ class AddBudgetScreenState extends State<AddBudgetScreen> {
                   }, recurrenceList,
                       isRecurrenceDialog: true, header: "Recurrence");
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25.0, right: 10.0),
-                      child: SvgPicture.asset(
-                        AssetUtils.FREQUENCY_WIDGET,
-                        width: 22,
-                        height: 22,
-                        color: Colors.blue,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      PlaceHolderWidget(placeHolder: AssetUtils.BUDGET_WIDGET),
+                      Expanded(
+                        child: StreamBuilder<String>(
+                          stream: recurrenceBloc.recurrenceStream,
+                          builder: (context, snapshot) {
+                            return Text(
+                              snapshot.data ?? 'Recurrence',
+                              style: TextStyle(
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.w500,
+                                  color: (snapshot.hasData)
+                                      ? Colors.black87
+                                      : Colors.grey),
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Recurrence',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black87),
-                      ),
-                    ),
-                    StreamBuilder<String>(
-                        stream: recurrenceBloc.recurrenceStream,
-                        builder: (context, snapshot) {
-                          String category = '';
-                          if (snapshot.hasData) {
-                            category = '${snapshot.data} >';
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: HeaderText(
-                              text: category,
-                              fontColor: Colors.blue,
-                            ),
-                          );
-                        })
-                  ],
+                    ],
+                  ),
                 ),
               ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
+              ),
               SizedBox(
-                height: 25,
+                height: 15,
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               InkWell(
                 onTap: () {
@@ -343,41 +366,56 @@ class AddBudgetScreenState extends State<AddBudgetScreen> {
                     startDateBloc.updateStartDate(budgetStartDate);
                   });
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25.0, right: 10.0),
-                      child:
-                          Icon(Icons.date_range, size: 20, color: Colors.blue),
-                    ),
-                    StreamBuilder<String>(
-                      stream: startDateBloc.startDateStream,
-                      builder: (context, snapshot) {
-                        return Text(
-                          snapshot.data ?? 'Starting Date',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black54),
-                        );
-                      },
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        decoration: new BoxDecoration(
+                            color: Color(0xFFefefef),
+                            borderRadius: new BorderRadius.all(
+                              Radius.circular(6.0),
+                            )),
+                        // width: 70,
+                        margin: EdgeInsets.only(left: 16, top: 8),
+                        padding: EdgeInsets.only(
+                            left: 12, right: 12, top: 4, bottom: 4),
+                        child: Icon(Icons.date_range,
+                            size: 15, color: Colors.blue),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      StreamBuilder<String>(
+                        stream: startDateBloc.startDateStream,
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? 'Start Date',
+                            style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
+                                color: (snapshot.hasData)
+                                    ? Colors.black87
+                                    : Colors.grey),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 1,
-                  color: Colors.black12,
-                ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               SizedBox(
                 height: 15,
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               InkWell(
                 onTap: () {
@@ -390,80 +428,99 @@ class AddBudgetScreenState extends State<AddBudgetScreen> {
                     endDateBloc.updateEndDate(budgetEndDate);
                   });
                 },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        decoration: new BoxDecoration(
+                            color: Color(0xFFefefef),
+                            borderRadius: new BorderRadius.all(
+                              Radius.circular(6.0),
+                            )),
+                        // width: 70,
+                        margin: EdgeInsets.only(left: 16, top: 8),
+                        padding: EdgeInsets.only(
+                            left: 12, right: 12, top: 4, bottom: 4),
+                        child: Icon(Icons.date_range,
+                            size: 15, color: Colors.blue),
+                      ),
+                      StreamBuilder<String>(
+                        stream: endDateBloc.endDateStream,
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data ?? 'End Date',
+                            style: TextStyle(
+                                fontSize: 26,
+                                fontWeight: FontWeight.w500,
+                                color: (snapshot.hasData)
+                                    ? Colors.black87
+                                    : Colors.grey),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
+                    Container(
+                      decoration: new BoxDecoration(
+                          color: Color(0xFFefefef),
+                          borderRadius: new BorderRadius.all(
+                            Radius.circular(6.0),
+                          )),
+                      // width: 70,
+                      margin: EdgeInsets.only(left: 16, top: 8),
+                      padding: EdgeInsets.only(
+                          left: 12, right: 12, top: 4, bottom: 4),
+                      child: Icon(Icons.notifications_active,
+                          size: 15, color: Colors.blue),
+                    ),
+                    Expanded(
+                      child: Text(
+                        'Notifications',
+                        style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey),
+                      ),
+                    ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 25.0, right: 10.0),
-                      child:
-                          Icon(Icons.date_range, size: 20, color: Colors.blue),
-                    ),
-                    StreamBuilder<String>(
-                      stream: endDateBloc.endDateStream,
-                      builder: (context, snapshot) {
-                        return Text(
-                          snapshot.data ?? 'Ending Date',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black54),
-                        );
-                      },
-                    ),
+                      padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Switch(value: true, onChanged: (isSelected) {}),
+                    )
                   ],
                 ),
               ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 10),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 1,
-                  color: Colors.black12,
-                ),
+              Divider(
+                height: 1,
+                color: Colors.grey,
               ),
               SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 25.0, right: 10.0),
-                    child: Icon(Icons.notifications_active,
-                        size: 22, color: Colors.blue),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Notifications',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black54),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                    child: Switch(value: true, onChanged: (isSelected) {}),
-                  )
-                ],
+                height: 15,
               ),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 30.0, vertical: 5),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 1,
-                  color: Colors.black12,
-                ),
-              ),
-              SizedBox(
-                height: 40,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
+                    const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                 child: FlatButton(
                   color: Colors.blue,
                   onPressed: () {
@@ -621,6 +678,30 @@ class AddBudgetScreenState extends State<AddBudgetScreen> {
       return 'Invalid End Date selected';
     }
     return null;
+  }
+}
+
+class PlaceHolderWidget extends StatelessWidget {
+  final String placeHolder;
+  PlaceHolderWidget({@required this.placeHolder});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: new BoxDecoration(
+          color: Color(0xFFefefef),
+          borderRadius: new BorderRadius.all(
+            Radius.circular(6.0),
+          )),
+      // width: 70,
+      margin: EdgeInsets.only(left: 16, top: 8),
+      padding: EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
+      child: SvgPicture.asset(
+        this.placeHolder,
+        width: 12,
+        height: 12,
+        color: Colors.blue,
+      ),
+    );
   }
 }
 
